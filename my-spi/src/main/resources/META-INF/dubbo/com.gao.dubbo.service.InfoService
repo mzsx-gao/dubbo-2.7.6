@@ -1,0 +1,3 @@
+a=com.gao.dubbo.service.impl.InfoServiceAImpl
+b=com.gao.dubbo.service.impl.InfoServiceBImpl
+c=com.gao.dubbo.service.impl.InfoServiceCImpl

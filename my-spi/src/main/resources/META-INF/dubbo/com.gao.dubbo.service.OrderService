@@ -1,0 +1,2 @@
+peter=com.gao.dubbo.service.impl.OrderServiceImpl
+james=com.gao.dubbo.service.impl.OrderServiceImpl2

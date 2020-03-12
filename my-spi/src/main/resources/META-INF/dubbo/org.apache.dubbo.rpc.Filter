@@ -1,0 +1,5 @@
+a=com.gao.dubbo.filter.FilterA
+b=com.gao.dubbo.filter.FilterB
+c=com.gao.dubbo.filter.FilterC
+d=com.gao.dubbo.filter.FilterD
+e=com.gao.dubbo.filter.FilterE
