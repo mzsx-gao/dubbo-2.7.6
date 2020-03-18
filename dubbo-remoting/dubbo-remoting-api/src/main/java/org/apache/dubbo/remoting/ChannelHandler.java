@@ -43,7 +43,7 @@ public interface ChannelHandler {
     void disconnected(Channel channel) throws RemotingException;
 
     /**
-     * on message sent.
+     * 发送给这个通道消息
      *
      * @param channel channel.
      * @param message message.
@@ -51,7 +51,7 @@ public interface ChannelHandler {
     void sent(Channel channel, Object message) throws RemotingException;
 
     /**
-     * on message received.
+     * 从这个通道内接收消息
      *
      * @param channel channel.
      * @param message message.
@@ -59,7 +59,7 @@ public interface ChannelHandler {
     void received(Channel channel, Object message) throws RemotingException;
 
     /**
-     * on exception caught.
+     * 从这个通道内捕获异常
      *
      * @param channel   channel.
      * @param exception exception.

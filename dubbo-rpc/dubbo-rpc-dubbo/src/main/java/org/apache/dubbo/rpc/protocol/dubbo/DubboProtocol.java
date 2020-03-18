@@ -107,6 +107,7 @@ public class DubboProtocol extends AbstractProtocol {
 
     private ExchangeHandler requestHandler = new ExchangeHandlerAdapter() {
 
+        // 处理客户端发送的信息，内部就是调用Invoker的invoke方法，这个方法主要是由HeaderExchangeHandler调用
         @Override
         public CompletableFuture<Object> reply(ExchangeChannel channel, Object message) throws RemotingException {
 
@@ -117,6 +118,8 @@ public class DubboProtocol extends AbstractProtocol {
             }
 
             Invocation inv = (Invocation) message;
+            logger.info("服务端收到客户端传递过来的Invocation信息:"+ inv.toString());
+            // 获取invoker,从exporterMap中获取
             Invoker<?> invoker = getInvoker(channel, inv);
             // need to consider backward-compatibility if it's a callback
             if (Boolean.TRUE.toString().equals(inv.getObjectAttachments().get(IS_CALLBACK_SERVICE_INVOKE))) {
@@ -251,7 +254,7 @@ public class DubboProtocol extends AbstractProtocol {
             path += "." + inv.getObjectAttachments().get(CALLBACK_SERVICE_KEY);
             inv.getObjectAttachments().put(IS_CALLBACK_SERVICE_INVOKE, Boolean.TRUE.toString());
         }
-
+        //org.apache.dubbo.demo.DemoService:20888
         String serviceKey = serviceKey(
                 port,
                 path,
@@ -289,6 +292,7 @@ public class DubboProtocol extends AbstractProtocol {
         String key = serviceKey(url);
         // 创建 DubboExporter
         DubboExporter<T> exporter = new DubboExporter<T>(invoker, key, exporterMap);
+        // 这里缓存进exporterMap是为了服务端接收到客户端请求后，根据invocation组装好serviceKey,然后从exporterMap获取invoker
         exporterMap.put(key, exporter);
 
         // export an stub service for dispatching event
@@ -424,6 +428,7 @@ public class DubboProtocol extends AbstractProtocol {
         return invoker;
     }
 
+    //这个方法里会去连接netty服务器
     private ExchangeClient[] getClients(URL url) {
         // whether to share connection
 
@@ -441,6 +446,7 @@ public class DubboProtocol extends AbstractProtocol {
             String shareConnectionsStr = url.getParameter(SHARE_CONNECTIONS_KEY, (String) null);
             connections = Integer.parseInt(StringUtils.isBlank(shareConnectionsStr) ? ConfigUtils.getProperty(SHARE_CONNECTIONS_KEY,
                     DEFAULT_SHARE_CONNECTIONS) : shareConnectionsStr);
+            // 关键方法，内部获取nettyClient
             shareClients = getSharedClient(url, connections);
         }
 
@@ -466,12 +472,10 @@ public class DubboProtocol extends AbstractProtocol {
     private List<ReferenceCountExchangeClient> getSharedClient(URL url, int connectNum) {
         String key = url.getAddress();
         List<ReferenceCountExchangeClient> clients = referenceClientMap.get(key);
-
         if (checkClientCanUse(clients)) {
             batchClientRefIncr(clients);
             return clients;
         }
-
         locks.putIfAbsent(key, new Object());
         synchronized (locks.get(key)) {
             clients = referenceClientMap.get(key);
@@ -480,15 +484,13 @@ public class DubboProtocol extends AbstractProtocol {
                 batchClientRefIncr(clients);
                 return clients;
             }
-
             // connectNum must be greater than or equal to 1
             connectNum = Math.max(connectNum, 1);
-
             // If the clients is empty, then the first initialization is
             if (CollectionUtils.isEmpty(clients)) {
+                // 关键方法
                 clients = buildReferenceCountExchangeClientList(url, connectNum);
                 referenceClientMap.put(key, clients);
-
             } else {
                 for (int i = 0; i < clients.size(); i++) {
                     ReferenceCountExchangeClient referenceCountExchangeClient = clients.get(i);
@@ -497,17 +499,14 @@ public class DubboProtocol extends AbstractProtocol {
                         clients.set(i, buildReferenceCountExchangeClient(url));
                         continue;
                     }
-
                     referenceCountExchangeClient.incrementAndGetCount();
                 }
             }
-
             /*
              * I understand that the purpose of the remove operation here is to avoid the expired url key
              * always occupying this memory space.
              */
             locks.remove(key);
-
             return clients;
         }
     }
@@ -580,15 +579,14 @@ public class DubboProtocol extends AbstractProtocol {
     }
 
     /**
-     * Create new connection
-     *
+     * 初始化nettyClient，内部连接上netty服务器
      * @param url
      */
     private ExchangeClient initClient(URL url) {
 
         // client type setting.
         String str = url.getParameter(CLIENT_KEY, url.getParameter(SERVER_KEY, DEFAULT_REMOTING_CLIENT));
-
+        // 添加codec参数
         url = url.addParameter(CODEC_KEY, DubboCodec.NAME);
         // enable heartbeat by default
         url = url.addParameterIfAbsent(HEARTBEAT_KEY, String.valueOf(DEFAULT_HEARTBEAT));
@@ -606,6 +604,7 @@ public class DubboProtocol extends AbstractProtocol {
                 client = new LazyConnectExchangeClient(url, requestHandler);
 
             } else {
+                //这里才是真正去连接netty服务器的地方
                 client = Exchangers.connect(url, requestHandler);
             }
 

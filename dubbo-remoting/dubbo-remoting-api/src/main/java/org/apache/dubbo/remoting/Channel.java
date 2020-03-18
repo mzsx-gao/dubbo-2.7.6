@@ -28,7 +28,7 @@ import java.net.InetSocketAddress;
 public interface Channel extends Endpoint {
 
     /**
-     * get remote address.
+     * 获得远程地址
      *
      * @return remote address.
      */

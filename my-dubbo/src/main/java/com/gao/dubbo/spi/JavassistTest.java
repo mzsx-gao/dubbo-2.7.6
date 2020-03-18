@@ -1,4 +1,4 @@
-package com.gao.dubbo;
+package com.gao.dubbo.spi;
 
 import javassist.*;
 import org.apache.dubbo.common.compiler.support.JavassistCompiler;

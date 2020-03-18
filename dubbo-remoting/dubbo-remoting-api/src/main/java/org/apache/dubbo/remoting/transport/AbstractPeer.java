@@ -33,8 +33,10 @@ public abstract class AbstractPeer implements Endpoint, ChannelHandler {
     private volatile URL url;
 
     // closing closed means the process is being closed and close is finished
+    // 是否正在关闭
     private volatile boolean closing;
 
+    // 是否关闭完成
     private volatile boolean closed;
 
     public AbstractPeer(URL url, ChannelHandler handler) {

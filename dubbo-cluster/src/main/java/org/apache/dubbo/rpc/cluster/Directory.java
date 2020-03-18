@@ -34,16 +34,12 @@ import java.util.List;
 public interface Directory<T> extends Node {
 
     /**
-     * get service type.
-     *
-     * @return service type.
+     * 获得服务类型
      */
     Class<T> getInterface();
 
     /**
-     * list invokers.
-     *
-     * @return invokers
+     * 获得所有服务Invoker集合
      */
     List<Invoker<T>> list(Invocation invocation) throws RpcException;
 

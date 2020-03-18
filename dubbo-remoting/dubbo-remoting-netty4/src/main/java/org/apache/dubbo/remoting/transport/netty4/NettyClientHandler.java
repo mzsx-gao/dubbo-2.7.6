@@ -59,7 +59,7 @@ public class NettyClientHandler extends ChannelDuplexHandler {
         NettyChannel channel = NettyChannel.getOrAddChannel(ctx.channel(), url, handler);
         handler.connected(channel);
         if (logger.isInfoEnabled()) {
-            logger.info("The connection of " + channel.getLocalAddress() + " -> " + channel.getRemoteAddress() + " is established.");
+            logger.info("连接就绪:The connection of " + channel.getLocalAddress() + " -> " + channel.getRemoteAddress() + " is established.");
         }
     }
 
@@ -79,6 +79,7 @@ public class NettyClientHandler extends ChannelDuplexHandler {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        logger.info("客户端收到服务端返回信息:" + msg.toString());
         NettyChannel channel = NettyChannel.getOrAddChannel(ctx.channel(), url, handler);
         handler.received(channel, msg);
     }

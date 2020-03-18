@@ -53,12 +53,10 @@ public abstract class AbstractClient extends AbstractEndpoint implements Client 
 
     public AbstractClient(URL url, ChannelHandler handler) throws RemotingException {
         super(url, handler);
-
         needReconnect = url.getParameter(Constants.SEND_RECONNECT_KEY, false);
-
         initExecutor(url);
-
         try {
+            // 初始化客户端
             doOpen();
         } catch (Throwable t) {
             close();
@@ -67,7 +65,7 @@ public abstract class AbstractClient extends AbstractEndpoint implements Client 
                             + " connect to the server " + getRemoteAddress() + ", cause: " + t.getMessage(), t);
         }
         try {
-            // connect.
+            // 连接远程服务器
             connect();
             if (logger.isInfoEnabled()) {
                 logger.info("Start " + getClass().getSimpleName() + " " + NetUtils.getLocalAddress() + " connect to the server " + getRemoteAddress());
@@ -94,6 +92,7 @@ public abstract class AbstractClient extends AbstractEndpoint implements Client 
         executor = executorRepository.createExecutorIfAbsent(url);
     }
 
+    // 包装通道处理器
     protected static ChannelHandler wrapChannelHandler(URL url, ChannelHandler handler) {
         return ChannelHandlers.wrap(handler, url);
     }
@@ -170,47 +169,41 @@ public abstract class AbstractClient extends AbstractEndpoint implements Client 
         if (needReconnect && !isConnected()) {
             connect();
         }
+        // 获得通道
         Channel channel = getChannel();
         //TODO Can the value returned by getChannel() be null? need improvement.
         if (channel == null || !channel.isConnected()) {
             throw new RemotingException(this, "message can not send, because channel is closed . url:" + getUrl());
         }
+        // 通过通道发送消息
         channel.send(message, sent);
     }
 
+    //连接远程服务器
     protected void connect() throws RemotingException {
-
         connectLock.lock();
-
         try {
-
             if (isConnected()) {
                 return;
             }
-
             doConnect();
-
             if (!isConnected()) {
                 throw new RemotingException(this, "Failed connect to server " + getRemoteAddress() + " from " + getClass().getSimpleName() + " "
                         + NetUtils.getLocalHost() + " using dubbo version " + Version.getVersion()
                         + ", cause: Connect wait timeout: " + getConnectTimeout() + "ms.");
-
             } else {
                 if (logger.isInfoEnabled()) {
-                    logger.info("Successed connect to server " + getRemoteAddress() + " from " + getClass().getSimpleName() + " "
+                    logger.info("成功连接到netty服务端:Successed connect to server " + getRemoteAddress() + " from " + getClass().getSimpleName() + " "
                             + NetUtils.getLocalHost() + " using dubbo version " + Version.getVersion()
                             + ", channel is " + this.getChannel());
                 }
             }
-
         } catch (RemotingException e) {
             throw e;
-
         } catch (Throwable e) {
             throw new RemotingException(this, "Failed connect to server " + getRemoteAddress() + " from " + getClass().getSimpleName() + " "
                     + NetUtils.getLocalHost() + " using dubbo version " + Version.getVersion()
                     + ", cause: " + e.getMessage(), e);
-
         } finally {
             connectLock.unlock();
         }
@@ -254,13 +247,11 @@ public abstract class AbstractClient extends AbstractEndpoint implements Client 
 
     @Override
     public void close() {
-
         try {
             super.close();
         } catch (Throwable e) {
             logger.warn(e.getMessage(), e);
         }
-
         try {
             if (executor != null) {
                 ExecutorUtil.shutdownNow(executor, 100);
@@ -268,13 +259,11 @@ public abstract class AbstractClient extends AbstractEndpoint implements Client 
         } catch (Throwable e) {
             logger.warn(e.getMessage(), e);
         }
-
         try {
             disconnect();
         } catch (Throwable e) {
             logger.warn(e.getMessage(), e);
         }
-
         try {
             doClose();
         } catch (Throwable e) {

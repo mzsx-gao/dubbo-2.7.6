@@ -1,4 +1,4 @@
-package com.gao.dubbo;
+package com.gao.dubbo.spi;
 
 import org.apache.dubbo.common.URL;
 import org.apache.dubbo.common.extension.ExtensionLoader;

@@ -45,7 +45,6 @@ public class RmiRemoteInvocation extends RemoteInvocation {
      * when ContextFilter gets executed, we will restore the attachment when Invocation is constructed, check more
      * from {@link org.apache.dubbo.rpc.proxy.InvokerInvocationHandler}
      */
-    @SuppressWarnings("unchecked")
     @Override
     public Object invoke(Object targetObject) throws NoSuchMethodException, IllegalAccessException,
             InvocationTargetException {

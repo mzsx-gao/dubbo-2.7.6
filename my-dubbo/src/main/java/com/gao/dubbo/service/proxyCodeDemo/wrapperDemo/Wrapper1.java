@@ -1,12 +1,13 @@
-package org.apache.dubbo.demo.provider.wrapperCode;
+package com.gao.dubbo.service.proxyCodeDemo.wrapperDemo;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
+import com.gao.dubbo.service.impl.DemoServiceImpl;
 import org.apache.dubbo.common.bytecode.ClassGenerator.DC;
 import org.apache.dubbo.common.bytecode.NoSuchMethodException;
 import org.apache.dubbo.common.bytecode.NoSuchPropertyException;
 import org.apache.dubbo.common.bytecode.Wrapper;
-import org.apache.dubbo.demo.provider.DemoServiceImpl;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
 
 public class Wrapper1 extends Wrapper implements DC {
 

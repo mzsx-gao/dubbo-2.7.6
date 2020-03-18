@@ -17,7 +17,7 @@
  *
  */
 
-package com.gao.dubbo;
+package com.gao.dubbo.spi;
 
 import com.gao.dubbo.service.OrderService;
 import com.gao.dubbo.service.PayService;

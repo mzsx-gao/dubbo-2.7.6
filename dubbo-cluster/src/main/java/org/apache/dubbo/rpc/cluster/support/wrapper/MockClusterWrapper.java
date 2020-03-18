@@ -22,8 +22,7 @@ import org.apache.dubbo.rpc.cluster.Cluster;
 import org.apache.dubbo.rpc.cluster.Directory;
 
 /**
- * mock impl
- *
+ * cluster包装类，所有的cluster都会被这个类包装
  */
 public class MockClusterWrapper implements Cluster {
 
@@ -35,8 +34,7 @@ public class MockClusterWrapper implements Cluster {
 
     @Override
     public <T> Invoker<T> join(Directory<T> directory) throws RpcException {
-        return new MockClusterInvoker<T>(directory,
-                this.cluster.join(directory));
+        return new MockClusterInvoker<T>(directory, this.cluster.join(directory));
     }
 
 }

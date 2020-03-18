@@ -47,10 +47,14 @@ public class AsyncToSyncInvoker<T> implements Invoker<T> {
         return invoker.getInterface();
     }
 
+    /**
+     * 这里会将异步请求转换成同步请求
+     */
     @Override
     public Result invoke(Invocation invocation) throws RpcException {
-        Result asyncResult = invoker.invoke(invocation);
 
+        // 得到的AsyncRpcResult对象的responseFuture属性是DefaultFuture
+        Result asyncResult = invoker.invoke(invocation);
         try {
             if (InvokeMode.SYNC == ((RpcInvocation) invocation).getInvokeMode()) {
                 /**
@@ -58,6 +62,7 @@ public class AsyncToSyncInvoker<T> implements Invoker<T> {
                  * must call {@link java.util.concurrent.CompletableFuture#get(long, TimeUnit)} because
                  * {@link java.util.concurrent.CompletableFuture#get()} was proved to have serious performance drop.
                  */
+                // 从异步结果中get结果;异步转同步，关键就是调用DefaultFuture的get()方法
                 asyncResult.get(Integer.MAX_VALUE, TimeUnit.MILLISECONDS);
             }
         } catch (InterruptedException e) {

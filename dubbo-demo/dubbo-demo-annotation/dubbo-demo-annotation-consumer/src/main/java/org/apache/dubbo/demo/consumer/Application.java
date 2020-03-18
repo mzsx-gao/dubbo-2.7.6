@@ -18,26 +18,26 @@
  */
 package org.apache.dubbo.demo.consumer;
 
+import org.apache.dubbo.config.RegistryConfig;
 import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;
 import org.apache.dubbo.demo.DemoService;
 import org.apache.dubbo.demo.consumer.comp.DemoServiceComponent;
 
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.*;
 
 public class Application {
     /**
      * In order to make sure multicast registry works, need to specify '-Djava.net.preferIPv4Stack=true' before
      * launch the application
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception{
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(ConsumerConfiguration.class);
         context.start();
+        System.out.println("客户端启动成功");
         DemoService service = context.getBean("demoServiceComponent", DemoServiceComponent.class);
         String hello = service.sayHello("world");
-        System.out.println("result :" + hello);
+        System.out.println("服务端返回结果result :" + hello);
+        System.in.read();
     }
 
     @Configuration
@@ -45,6 +45,14 @@ public class Application {
     @PropertySource("classpath:/spring/dubbo-consumer.properties")
     @ComponentScan(value = {"org.apache.dubbo.demo.consumer.comp"})
     static class ConsumerConfiguration {
+
+        @Bean
+        public RegistryConfig registryConfig() {
+            RegistryConfig registryConfig = new RegistryConfig();
+            registryConfig.setAddress("zookeeper://127.0.0.1:2181");
+            registryConfig.setSimplified(true);
+            return registryConfig;
+        }
 
     }
 }

@@ -18,11 +18,9 @@
  */
 package org.apache.dubbo.demo.provider;
 
-import org.apache.dubbo.config.ApplicationConfig;
-import org.apache.dubbo.config.ProtocolConfig;
+import org.apache.dubbo.config.MetadataReportConfig;
 import org.apache.dubbo.config.RegistryConfig;
 import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;
-
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,8 +31,6 @@ public class Application {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(ProviderConfiguration.class);
         context.start();
 
-//        ApplicationConfig applicationConfig = (ApplicationConfig)context.getBean("applicationConfig");
-//        ProtocolConfig protocolConfig = (ProtocolConfig)context.getBean("protocolConfig");
         System.out.println("启动成功");
         System.in.read();
     }
@@ -48,7 +44,15 @@ public class Application {
         public RegistryConfig registryConfig() {
             RegistryConfig registryConfig = new RegistryConfig();
             registryConfig.setAddress("zookeeper://127.0.0.1:2181");
+            registryConfig.setSimplified(true);
             return registryConfig;
         }
+//
+//        @Bean
+//        public MetadataReportConfig metadataReportConfig() {
+//            MetadataReportConfig metadataReportConfig = new MetadataReportConfig();
+//            metadataReportConfig.setAddress("zookeeper://localhost:2181");
+//            return metadataReportConfig;
+//        }
     }
 }

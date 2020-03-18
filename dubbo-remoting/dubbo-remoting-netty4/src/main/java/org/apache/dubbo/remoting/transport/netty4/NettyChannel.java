@@ -38,6 +38,7 @@ import static org.apache.dubbo.common.constants.CommonConstants.TIMEOUT_KEY;
 
 /**
  * NettyChannel maintains the cache of channel.
+ * 基于netty4的通道实现类
  */
 final class NettyChannel extends AbstractChannel {
 
@@ -159,7 +160,9 @@ final class NettyChannel extends AbstractChannel {
         boolean success = true;
         int timeout = 0;
         try {
+            // 写入数据，发送消息
             ChannelFuture future = channel.writeAndFlush(message);
+            // 如果已经发送过
             if (sent) {
                 // wait timeout ms
                 timeout = getUrl().getPositiveParameter(TIMEOUT_KEY, DEFAULT_TIMEOUT);

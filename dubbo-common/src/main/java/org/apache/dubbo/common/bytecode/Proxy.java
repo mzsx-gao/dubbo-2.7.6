@@ -19,6 +19,7 @@ package org.apache.dubbo.common.bytecode;
 import org.apache.dubbo.common.utils.ClassUtils;
 import org.apache.dubbo.common.utils.ReflectUtils;
 
+import java.io.FileOutputStream;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationHandler;
@@ -195,6 +196,11 @@ public abstract class Proxy {
             Class<?> clazz = ccp.toClass();
             clazz.getField("methods").set(null, methods.toArray(new Method[0]));
 
+//            String path = "/Users/gaoshudian/work/developer/workspace/dubbo-workspace/dubbo-2.7.6/my-spi/src/main/java/com/gao/dubbo/service/proxyCodeDemo/proxy0.class";
+//            FileOutputStream output = new FileOutputStream(path);
+//            output.write(ccp.getmCtc().toBytecode());
+//            output.close();
+
             // create Proxy class.
             String fcn = Proxy.class.getName() + id;
             ccm = ClassGenerator.newInstance(cl);
@@ -203,6 +209,12 @@ public abstract class Proxy {
             ccm.setSuperClass(Proxy.class);
             ccm.addMethod("public Object newInstance(" + InvocationHandler.class.getName() + " h){ return new " + pcn + "($1); }");
             Class<?> pc = ccm.toClass();
+
+//            String path2 = "/Users/gaoshudian/work/developer/workspace/dubbo-workspace/dubbo-2.7.6/my-spi/src/main/java/com/gao/dubbo/service/proxyCodeDemo/Proxy1.class";
+//            FileOutputStream output2 = new FileOutputStream(path2);
+//            output2.write(ccm.getmCtc().toBytecode());
+//            output2.close();
+
             proxy = (Proxy) pc.newInstance();
         } catch (RuntimeException e) {
             throw e;

@@ -1,4 +1,4 @@
-package com.gao.dubbo;
+package com.gao.dubbo.spi;
 
 import com.gao.dubbo.service.InfoService;
 import com.gao.dubbo.service.OrderService;

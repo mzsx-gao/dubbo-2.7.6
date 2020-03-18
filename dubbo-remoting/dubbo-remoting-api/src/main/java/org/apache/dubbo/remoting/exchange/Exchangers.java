@@ -28,6 +28,7 @@ import org.apache.dubbo.remoting.transport.ChannelHandlerAdapter;
 
 /**
  * Exchanger facade. (API, Static, ThreadSafe)
+ * 该类跟Transporters的设计意图是一样的，Exchangers也用到了外观模式
  */
 public class Exchangers {
 
@@ -59,6 +60,7 @@ public class Exchangers {
         return bind(URL.valueOf(url), handler);
     }
 
+    // 绑定netty服务器
     public static ExchangeServer bind(URL url, ExchangeHandler handler) throws RemotingException {
         if (url == null) {
             throw new IllegalArgumentException("url == null");
@@ -98,7 +100,7 @@ public class Exchangers {
     public static ExchangeClient connect(String url, ExchangeHandler handler) throws RemotingException {
         return connect(URL.valueOf(url), handler);
     }
-
+    // 连接netty服务器
     public static ExchangeClient connect(URL url, ExchangeHandler handler) throws RemotingException {
         if (url == null) {
             throw new IllegalArgumentException("url == null");

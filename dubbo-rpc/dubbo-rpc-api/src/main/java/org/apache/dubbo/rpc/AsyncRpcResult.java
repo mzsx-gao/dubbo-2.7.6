@@ -50,13 +50,20 @@ public class AsyncRpcResult implements Result {
     private static final Logger logger = LoggerFactory.getLogger(AsyncRpcResult.class);
 
     /**
-     * RpcContext may already have been changed when callback happens, it happens when the same thread is used to execute another RPC call.
-     * So we should keep the reference of current RpcContext instance and restore it before callback being executed.
+     * 当相同的线程用于执行另一个RPC调用时，并且回调发生时，原来的RpcContext可能已经被更改。
+     * 所以我们应该保留当前RpcContext实例的引用，并在执行回调之前恢复它。
+     * 存储当前的RpcContext
      */
     private RpcContext storedContext;
+    /**
+     * 存储当前的ServerContext
+     */
     private RpcContext storedServerContext;
     private Executor executor;
 
+    /**
+     * 会话域
+     */
     private Invocation invocation;
 
     private CompletableFuture<AppResponse> responseFuture;
@@ -64,14 +71,15 @@ public class AsyncRpcResult implements Result {
     public AsyncRpcResult(CompletableFuture<AppResponse> future, Invocation invocation) {
         this.responseFuture = future;
         this.invocation = invocation;
+        // 获得当前线程内代表消费者端的Context
         this.storedContext = RpcContext.getContext();
+        // 获得当前线程内代表服务端的Context
         this.storedServerContext = RpcContext.getServerContext();
     }
 
     /**
      * Notice the return type of {@link #getValue} is the actual type of the RPC method, not {@link AppResponse}
-     *
-     * @return
+     * 获得计算的结果
      */
     @Override
     public Object getValue() {
@@ -94,8 +102,11 @@ public class AsyncRpcResult implements Result {
             if (responseFuture.isDone()) {
                 responseFuture.get().setValue(value);
             } else {
+                // 创建一个AppResponse实例
                 AppResponse appResponse = new AppResponse();
+                // 把结果放入AppResponse
                 appResponse.setValue(value);
+                // 标志该future完成，并且把携带结果的appResponse设置为该future的结果
                 responseFuture.complete(appResponse);
             }
         } catch (Exception e) {
@@ -142,6 +153,7 @@ public class AsyncRpcResult implements Result {
 
     public Result getAppResponse() {
         try {
+            // 如果该结果计算完成，则直接调用get方法获得结果
             if (responseFuture.isDone()) {
                 return responseFuture.get();
             }
@@ -184,6 +196,7 @@ public class AsyncRpcResult implements Result {
     @Override
     public Object recreate() throws Throwable {
         RpcInvocation rpcInvocation = (RpcInvocation) invocation;
+        // 如果返回的是future类型
         if (InvokeMode.FUTURE == rpcInvocation.getInvokeMode()) {
             return RpcContext.getContext().getFuture();
         }

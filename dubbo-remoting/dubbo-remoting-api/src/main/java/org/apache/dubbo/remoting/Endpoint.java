@@ -38,9 +38,7 @@ public interface Endpoint {
     URL getUrl();
 
     /**
-     * get channel handler.
-     *
-     * @return channel handler
+     * 获得该端的通道处理器
      */
     ChannelHandler getChannelHandler();
 
@@ -60,8 +58,7 @@ public interface Endpoint {
     void send(Object message) throws RemotingException;
 
     /**
-     * send message.
-     *
+     * 发送消息，sent是是否已经发送的标记
      * @param message
      * @param sent    already sent to socket?
      */

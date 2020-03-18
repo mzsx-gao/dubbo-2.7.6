@@ -53,7 +53,6 @@ public class FailoverClusterInvoker<T> extends AbstractClusterInvoker<T> {
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public Result doInvoke(Invocation invocation, final List<Invoker<T>> invokers, LoadBalance loadbalance) throws RpcException {
         List<Invoker<T>> copyInvokers = invokers;
         checkInvokers(copyInvokers, invocation);
@@ -66,9 +65,12 @@ public class FailoverClusterInvoker<T> extends AbstractClusterInvoker<T> {
         RpcException le = null; // last exception.
         List<Invoker<T>> invoked = new ArrayList<Invoker<T>>(copyInvokers.size()); // invoked invokers.
         Set<String> providers = new HashSet<String>(len);
+        // 循环调用，失败重试
         for (int i = 0; i < len; i++) {
             //Reselect before retry to avoid a change of candidate `invokers`.
             //NOTE: if `invokers` changed, then `invoked` also lose accuracy.
+            // 在进行重试前重新列举 Invoker，这样做的好处是，如果某个服务挂了，
+            // 通过调用 list 可得到最新可用的 Invoker 列表
             if (i > 0) {
                 checkWhetherDestroyed();
                 copyInvokers = list(invocation);

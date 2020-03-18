@@ -282,7 +282,6 @@ public class RegistryProtocol implements Protocol {
      * @param newInvokerUrl
      * @param <T>
      */
-    @SuppressWarnings("unchecked")
     public <T> void reExport(final Invoker<T> originInvoker, URL newInvokerUrl) {
         String key = getCacheKey(originInvoker);
         ExporterChangeableWrapper<T> exporter = (ExporterChangeableWrapper<T>) bounds.get(key);
@@ -412,23 +411,37 @@ public class RegistryProtocol implements Protocol {
         return key;
     }
 
+    /**
+     * 引用服务，生成Invoke
+     */
     @Override
-    @SuppressWarnings("unchecked")
     public <T> Invoker<T> refer(Class<T> type, URL url) throws RpcException {
+        /**
+         * 获取注册中心url:如:
+         * zookeeper://127.0.0.1:2181/org.apache.dubbo.registry.RegistryService?application=dubbo-demo-annotation-consumer
+         * &dubbo=2.0.2&pid=16490&refer=application=dubbo-demo-annotation-consumer&dubbo=2.0.2&init=false
+         * &interface=org.apache.dubbo.demo.DemoService&methods=sayHello,sayHelloAsync&pid=16490&register.ip=192.168.1.8
+         * &side=consumer&sticky=false&timestamp=1583995362301&timestamp=1583995363363
+         */
         url = getRegistryUrl(url);
+        // 获取注册中心示例，如:ZookeeperRegistry
         Registry registry = registryFactory.getRegistry(url);
+        // 如果是注册中心服务，则返回注册中心服务的invoker
         if (RegistryService.class.equals(type)) {
             return proxyFactory.getInvoker((T) registry, type, url);
         }
 
         // group="a,b" or group="*"
+        // 将 url 查询字符串转为 Map
         Map<String, String> qs = StringUtils.parseQueryString(url.getParameterAndDecoded(REFER_KEY));
         String group = qs.get(GROUP_KEY);
         if (group != null && group.length() > 0) {
             if ((COMMA_SPLIT_PATTERN.split(group)).length > 1 || "*".equals(group)) {
+                // 如果有多个组，或者组配置为*，则使用MergeableCluster，并调用 doRefer 继续执行服务引用逻辑
                 return doRefer(getMergeableCluster(), registry, type, url);
             }
         }
+        // 只有一个组或者没有组配置，则直接执行doRefer
         return doRefer(cluster, registry, type, url);
     }
 
@@ -437,19 +450,27 @@ public class RegistryProtocol implements Protocol {
     }
 
     private <T> Invoker<T> doRefer(Cluster cluster, Registry registry, Class<T> type, URL url) {
+        // 创建 RegistryDirectory 实例
         RegistryDirectory<T> directory = new RegistryDirectory<T>(type, url);
+        // 设置注册中心
         directory.setRegistry(registry);
+        // 设置协议
         directory.setProtocol(protocol);
-        // all attributes of REFER_KEY
-        Map<String, String> parameters = new HashMap<String, String>(directory.getConsumerUrl().getParameters());
+        // 所有属性放到map中
+        Map<String, String> parameters = new HashMap<>(directory.getConsumerUrl().getParameters());
+        // 生成服务消费者链接
         URL subscribeUrl = new URL(CONSUMER_PROTOCOL, parameters.remove(REGISTER_IP_KEY), 0, type.getName(), parameters);
         if (directory.isShouldRegister()) {
             directory.setRegisteredConsumerUrl(subscribeUrl);
+            // 注册服务消费者
             registry.register(directory.getRegisteredConsumerUrl());
         }
+        // 创建路由规则链
         directory.buildRouterChain(subscribeUrl);
+        // 订阅 providers、configurators、routers 等节点数据
         directory.subscribe(toSubscribeUrl(subscribeUrl));
 
+        // 一个注册中心可能有多个服务提供者，因此这里需要将多个服务提供者合并为一个，生成一个invoker
         Invoker<T> invoker = cluster.join(directory);
         List<RegistryProtocolListener> listeners = findRegistryProtocolListeners(url);
         if (CollectionUtils.isEmpty(listeners)) {

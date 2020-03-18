@@ -143,6 +143,12 @@ public class ZookeeperRegistry extends FailbackRegistry {
         }
     }
 
+    /**
+     * 订阅 providers、configurators、routers 等节点数据，这里的url为:
+     * consumer://192.168.151.2/org.apache.dubbo.demo.DemoService?application=dubbo-demo-annotation-consumer
+     * &category=providers,configurators,routers&dubbo=2.0.2&init=false&interface=org.apache.dubbo.demo.DemoService
+     * &methods=sayHello,sayHelloAsync&pid=3295&side=consumer&sticky=false&timestamp=1584081375640
+     */
     @Override
     public void doSubscribe(final URL url, final NotifyListener listener) {
         try {
@@ -169,17 +175,39 @@ public class ZookeeperRegistry extends FailbackRegistry {
                                 Constants.CHECK_KEY, String.valueOf(false)), listener);
                     }
                 }
-            } else {
+            }
+            else {
                 List<URL> urls = new ArrayList<>();
+                /**
+                 * 这里订阅三个路径的变化：
+                 * /dubbo/org.apache.dubbo.demo.DemoService/providers
+                 * /dubbo/org.apache.dubbo.demo.DemoService/configurators
+                 * /dubbo/org.apache.dubbo.demo.DemoService/routers
+                 */
                 for (String path : toCategoriesPath(url)) {
                     ConcurrentMap<NotifyListener, ChildListener> listeners = zkListeners.computeIfAbsent(url, k -> new ConcurrentHashMap<>());
-                    ChildListener zkListener = listeners.computeIfAbsent(listener, k -> (parentPath, currentChilds) -> ZookeeperRegistry.this.notify(url, k, toUrlsWithEmpty(url, parentPath, currentChilds)));
+                    ChildListener zkListener = listeners.computeIfAbsent(listener,
+                            k -> (parentPath, currentChilds) -> ZookeeperRegistry.this.notify(url, k, toUrlsWithEmpty(url, parentPath, currentChilds)));
+
                     zkClient.create(path, false);
                     List<String> children = zkClient.addChildListener(path, zkListener);
                     if (children != null) {
                         urls.addAll(toUrlsWithEmpty(url, path, children));
                     }
                 }
+                /**
+                 * dubbo://192.168.151.2:20888/org.apache.dubbo.demo.DemoService?anyhost=true&application=dubbo-demo-annotation-provider&deprecated=false
+                 * &dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService&methods=sayHello,sayHelloAsync&pid=1905
+                 * &release=&side=provider&timestamp=1584070392770
+                 *
+                 * empty://192.168.151.2/org.apache.dubbo.demo.DemoService?application=dubbo-demo-annotation-consumer&category=configurators
+                 * &dubbo=2.0.2&init=false&interface=org.apache.dubbo.demo.DemoService&methods=sayHello,sayHelloAsync&pid=3745&side=consumer
+                 * &sticky=false&timestamp=1584084235038
+                 *
+                 * empty://192.168.151.2/org.apache.dubbo.demo.DemoService?application=dubbo-demo-annotation-consumer&category=routers
+                 * &dubbo=2.0.2&init=false&interface=org.apache.dubbo.demo.DemoService&methods=sayHello,sayHelloAsync&pid=3745
+                 * &side=consumer&sticky=false&timestamp=1584084235038
+                 */
                 notify(url, listener, urls);
             }
         } catch (Throwable e) {

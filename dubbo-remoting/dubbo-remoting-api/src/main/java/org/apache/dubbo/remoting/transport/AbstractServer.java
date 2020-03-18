@@ -42,6 +42,7 @@ import static org.apache.dubbo.remoting.Constants.IDLE_TIMEOUT_KEY;
 
 /**
  * AbstractServer
+ * 服务器抽象类,重点实现了服务器的公共逻辑，比如发送消息，关闭通道，连接通道，断开连接等。并且抽象了打开和关闭服务器两个方法
  */
 public abstract class AbstractServer extends AbstractEndpoint implements RemotingServer {
 
@@ -92,6 +93,7 @@ public abstract class AbstractServer extends AbstractEndpoint implements Remotin
             return;
         }
         try {
+            // 重置accepts的值
             if (url.hasParameter(ACCEPTS_KEY)) {
                 int a = url.getParameter(ACCEPTS_KEY, 0);
                 if (a > 0) {
@@ -102,6 +104,7 @@ public abstract class AbstractServer extends AbstractEndpoint implements Remotin
             logger.error(t.getMessage(), t);
         }
         try {
+            // 重置idle.timeout的值
             if (url.hasParameter(IDLE_TIMEOUT_KEY)) {
                 int t = url.getParameter(IDLE_TIMEOUT_KEY, 0);
                 if (t > 0) {
@@ -112,6 +115,7 @@ public abstract class AbstractServer extends AbstractEndpoint implements Remotin
             logger.error(t.getMessage(), t);
         }
         executorRepository.updateThreadpool(url, executor);
+        // 重置url
         super.setUrl(getUrl().addParameters(url.getParameters()));
     }
 

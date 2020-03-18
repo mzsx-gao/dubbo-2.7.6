@@ -40,6 +40,7 @@ public class TimeoutFilter implements Filter, Filter.Listener {
 
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
+        logger.info("走了timeoutFilter过滤器。。。");
         invocation.put(TIMEOUT_FILTER_START_TIME, System.currentTimeMillis());
         return invoker.invoke(invocation);
     }

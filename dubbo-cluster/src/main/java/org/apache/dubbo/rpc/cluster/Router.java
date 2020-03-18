@@ -44,7 +44,7 @@ public interface Router extends Comparable<Router> {
 
     /**
      * Filter invokers with current routing rule and only return the invokers that comply with the rule.
-     *
+     * 筛选出跟规则匹配的Invoker集合
      * @param invokers   invoker list
      * @param url        refer url
      * @param invocation invocation

@@ -16,8 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.gao.dubbo.service.proxyCodeDemo.wrapperDemo;
+package com.gao.dubbo.service.impl;
 
+import com.gao.dubbo.service.DemoService;
 import org.apache.dubbo.common.logger.Logger;
 import org.apache.dubbo.common.logger.LoggerFactory;
 import org.apache.dubbo.config.annotation.Service;

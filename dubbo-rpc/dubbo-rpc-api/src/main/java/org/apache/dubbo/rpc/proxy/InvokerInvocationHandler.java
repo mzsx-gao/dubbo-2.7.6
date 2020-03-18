@@ -43,6 +43,7 @@ public class InvokerInvocationHandler implements InvocationHandler {
         }
     }
 
+    // 创建RpcInvocation，然后再调用invoke
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (method.getDeclaringClass() == Object.class) {
@@ -63,6 +64,7 @@ public class InvokerInvocationHandler implements InvocationHandler {
             return invoker.equals(args[0]);
         }
         RpcInvocation rpcInvocation = new RpcInvocation(method, invoker.getInterface().getName(), args);
+        //org.apache.dubbo.demo.DemoService
         String serviceKey = invoker.getUrl().getServiceKey();
         rpcInvocation.setTargetServiceUniqueName(serviceKey);
       
@@ -70,7 +72,7 @@ public class InvokerInvocationHandler implements InvocationHandler {
             rpcInvocation.put(Constants.CONSUMER_MODEL, consumerModel);
             rpcInvocation.put(Constants.METHOD_MODEL, consumerModel.getMethodModel(method));
         }
-
+        // 调用invoke
         return invoker.invoke(rpcInvocation).recreate();
     }
 }

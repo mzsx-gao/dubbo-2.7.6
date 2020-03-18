@@ -83,9 +83,7 @@ public class NettyClient extends AbstractClient {
     }
 
     /**
-     * Init bootstrap
-     *
-     * @throws Throwable
+     * 初始化Netty客户端
      */
     @Override
     protected void doOpen() throws Throwable {
@@ -126,6 +124,9 @@ public class NettyClient extends AbstractClient {
         });
     }
 
+    /**
+     * 连接netty服务器
+     */
     @Override
     protected void doConnect() throws Throwable {
         long start = System.currentTimeMillis();

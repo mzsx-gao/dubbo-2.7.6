@@ -14,16 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gao.dubbo.service.proxyCodeDemo.wrapperDemo;
+package com.gao.dubbo.service.impl;
 
-import java.util.concurrent.CompletableFuture;
+import com.gao.dubbo.service.DemoService;
 
-public interface DemoService {
+public class ZkDemoServiceImpl implements DemoService {
 
-    String sayHello(String name);
-
-    default CompletableFuture<String> sayHelloAsync(String name) {
-        return CompletableFuture.completedFuture(sayHello(name));
+    private String name;
+    public ZkDemoServiceImpl(String name) {
+        this.name = name;
     }
+
+    public String sayHello(String msg) {
+        System.out.println("hello " + name + ", msg:"+msg);
+        return "Hello, " + name+","+msg;
+    }
+
 
 }

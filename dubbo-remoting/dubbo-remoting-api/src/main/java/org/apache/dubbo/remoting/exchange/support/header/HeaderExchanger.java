@@ -27,13 +27,13 @@ import org.apache.dubbo.remoting.transport.DecodeHandler;
 
 /**
  * DefaultMessenger
- *
- *
+ * 分别调用的是Transporters的连接和绑定方法
  */
 public class HeaderExchanger implements Exchanger {
 
     public static final String NAME = "header";
 
+    //连接服务器
     @Override
     public ExchangeClient connect(URL url, ExchangeHandler handler) throws RemotingException {
         return new HeaderExchangeClient(Transporters.connect(url, new DecodeHandler(new HeaderExchangeHandler(handler))), true);

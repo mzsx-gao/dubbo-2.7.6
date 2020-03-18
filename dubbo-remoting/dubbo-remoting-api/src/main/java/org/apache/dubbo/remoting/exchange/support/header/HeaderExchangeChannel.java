@@ -38,6 +38,7 @@ import static org.apache.dubbo.common.constants.CommonConstants.TIMEOUT_KEY;
 
 /**
  * ExchangeReceiver
+ * 该类实现了ExchangeChannel，是基于协议头的信息交换通道
  */
 final class HeaderExchangeChannel implements ExchangeChannel {
 
@@ -60,10 +61,14 @@ final class HeaderExchangeChannel implements ExchangeChannel {
         if (ch == null) {
             return null;
         }
+        // 获得通道中的HeaderExchangeChannel
         HeaderExchangeChannel ret = (HeaderExchangeChannel) ch.getAttribute(CHANNEL_KEY);
         if (ret == null) {
+            // 创建一个HeaderExchangeChannel实例
             ret = new HeaderExchangeChannel(ch);
+            // 如果通道连接
             if (ch.isConnected()) {
+                // 加入属性值
                 ch.setAttribute(CHANNEL_KEY, ret);
             }
         }
@@ -87,18 +92,22 @@ final class HeaderExchangeChannel implements ExchangeChannel {
         send(message, false);
     }
 
+    // 发送消息
     @Override
     public void send(Object message, boolean sent) throws RemotingException {
         if (closed) {
             throw new RemotingException(this.getLocalAddress(), null, "Failed to send message " + message + ", cause: The channel " + this + " is closed!");
         }
+        // 判断消息的类型
         if (message instanceof Request
                 || message instanceof Response
                 || message instanceof String) {
+            // 发送消息
             channel.send(message, sent);
         } else {
             Request request = new Request();
             request.setVersion(Version.getProtocolVersion());
+            // 该请求不需要响应
             request.setTwoWay(false);
             request.setData(message);
             channel.send(request, sent);
@@ -120,6 +129,7 @@ final class HeaderExchangeChannel implements ExchangeChannel {
         return request(request, channel.getUrl().getPositiveParameter(TIMEOUT_KEY, DEFAULT_TIMEOUT), executor);
     }
 
+    //该方法是请求方法，用Request模型把请求内容装饰起来，然后发送一个Request类型的消息，并且返回DefaultFuture实例
     @Override
     public CompletableFuture<Object> request(Object request, int timeout, ExecutorService executor) throws RemotingException {
         if (closed) {
@@ -130,8 +140,10 @@ final class HeaderExchangeChannel implements ExchangeChannel {
         req.setVersion(Version.getProtocolVersion());
         req.setTwoWay(true);
         req.setData(request);
+        // 创建DefaultFuture对象，可以从future中主动获得请求对应的响应信息
         DefaultFuture future = DefaultFuture.newFuture(channel, req, timeout, executor);
         try {
+            // 发送请求消息
             channel.send(req);
         } catch (RemotingException e) {
             future.cancel();

@@ -29,8 +29,27 @@ import org.apache.dubbo.rpc.proxy.InvokerInvocationHandler;
  */
 public class JavassistProxyFactory extends AbstractProxyFactory {
 
+    /**
+     * 生成的代理类如下:
+     * public class proxy0 implements org.apache.dubbo.demo.DemoService {
+     *     public static java.lang.reflect.Method[] methods;
+     *     private java.lang.reflect.InvocationHandler handler;
+     *     public proxy0() {
+     *     }
+     *     public proxy0(java.lang.reflect.InvocationHandler arg0) {
+     *         handler = $1;
+     *     }
+     *     public java.lang.String sayHello(java.lang.String arg0) {
+     *         Object[] args = new Object[1];
+     *         args[0] = ($w) $1;
+     *         Object ret = handler.invoke(this, methods[0], args);
+     *         return (java.lang.String) ret;
+     *     }
+     * }
+     */
     @Override
     public <T> T getProxy(Invoker<T> invoker, Class<?>[] interfaces) {
+        // 生成 Proxy 子类（Proxy 是抽象类）。并调用 Proxy 子类的 newInstance 方法创建 Proxy 实例
         return (T) Proxy.getProxy(interfaces).newInstance(new InvokerInvocationHandler(invoker));
     }
 

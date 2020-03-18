@@ -29,6 +29,9 @@ import org.apache.dubbo.remoting.transport.dispatcher.WrappedChannelHandler;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 
+/**
+ * 该类也继承了WrappedChannelHandler，也是为了增强功能，处理的是连接、断开连接、捕获异常以及接收到的所有消息都分发到线程池
+ */
 public class AllChannelHandler extends WrappedChannelHandler {
 
     public AllChannelHandler(ChannelHandler handler, URL url) {
@@ -39,6 +42,7 @@ public class AllChannelHandler extends WrappedChannelHandler {
     public void connected(Channel channel) throws RemotingException {
         ExecutorService executor = getExecutorService();
         try {
+            // 把连接操作分发到线程池处理
             executor.execute(new ChannelEventRunnable(channel, handler, ChannelState.CONNECTED));
         } catch (Throwable t) {
             throw new ExecutionException("connect event", channel, getClass() + " error when process connected event .", t);
@@ -61,6 +65,7 @@ public class AllChannelHandler extends WrappedChannelHandler {
         try {
             executor.execute(new ChannelEventRunnable(channel, handler, ChannelState.RECEIVED, message));
         } catch (Throwable t) {
+            // 这里处理线程池满的问题，只有在请求时候会出现。线程池已满，拒绝调用，不返回，并导致使用者等待超时
         	if(message instanceof Request && t instanceof RejectedExecutionException){
                 sendFeedback(channel, (Request) message, t);
                 return;
@@ -73,6 +78,7 @@ public class AllChannelHandler extends WrappedChannelHandler {
     public void caught(Channel channel, Throwable exception) throws RemotingException {
         ExecutorService executor = getExecutorService();
         try {
+            // 把捕获异常作分发到线程池处理
             executor.execute(new ChannelEventRunnable(channel, handler, ChannelState.CAUGHT, exception));
         } catch (Throwable t) {
             throw new ExecutionException("caught event", channel, getClass() + " error when process caught event .", t);

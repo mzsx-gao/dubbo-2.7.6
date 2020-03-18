@@ -34,7 +34,7 @@ public interface Cluster {
 
     /**
      * Merge the directory invokers to a virtual invoker.
-     *
+     * 把Directory对象变成一个 Invoker 对象用来后续的一系列调用，该Invoker代表了一个集群实现
      * @param <T>
      * @param directory
      * @return cluster invoker

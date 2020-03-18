@@ -24,6 +24,9 @@ import org.apache.dubbo.remoting.transport.ChannelHandlerDispatcher;
 
 /**
  * Transporter facade. (API, Static, ThreadSafe)
+ * 该类用到了设计模式的外观模式，通过该类的包装，我们就不会看到内部具体的实现细节，这样降低了程序的复杂度，也提高了程序的可维护性。
+ * 比如这个类，包装了调用各种实现Transporter接口的方法，通过getTransporter来获得Transporter的实现对象，具体实现哪个实现类，
+ * 取决于url中携带的配置信息，如果url中没有相应的配置，则默认选择@SPI中的默认值netty
  */
 public class Transporters {
 
@@ -40,6 +43,7 @@ public class Transporters {
         return bind(URL.valueOf(url), handler);
     }
 
+    // 绑定服务器
     public static RemotingServer bind(URL url, ChannelHandler... handlers) throws RemotingException {
         if (url == null) {
             throw new IllegalArgumentException("url == null");
@@ -66,6 +70,7 @@ public class Transporters {
         return connect(URL.valueOf(url), handler);
     }
 
+    // 连接服务器
     public static Client connect(URL url, ChannelHandler... handlers) throws RemotingException {
         if (url == null) {
             throw new IllegalArgumentException("url == null");

@@ -385,11 +385,19 @@ public abstract class AbstractRegistry implements Registry {
     }
 
     /**
-     * Notify changes from the Provider side.
+     * 通知来自服务端的改变：
      *
-     * @param url      consumer side url
-     * @param listener listener
-     * @param urls     provider latest urls
+     * dubbo://192.168.151.2:20888/org.apache.dubbo.demo.DemoService?anyhost=true&application=dubbo-demo-annotation-provider&deprecated=false
+     * &dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService&methods=sayHello,sayHelloAsync&pid=1905
+     * &release=&side=provider&timestamp=1584070392770
+     *
+     * empty://192.168.151.2/org.apache.dubbo.demo.DemoService?application=dubbo-demo-annotation-consumer&category=configurators
+     * &dubbo=2.0.2&init=false&interface=org.apache.dubbo.demo.DemoService&methods=sayHello,sayHelloAsync&pid=3745&side=consumer
+     * &sticky=false&timestamp=1584084235038
+     *
+     * empty://192.168.151.2/org.apache.dubbo.demo.DemoService?application=dubbo-demo-annotation-consumer&category=routers
+     * &dubbo=2.0.2&init=false&interface=org.apache.dubbo.demo.DemoService&methods=sayHello,sayHelloAsync&pid=3745
+     * &side=consumer&sticky=false&timestamp=1584084235038
      */
     protected void notify(URL url, NotifyListener listener, List<URL> urls) {
         if (url == null) {
@@ -398,13 +406,12 @@ public abstract class AbstractRegistry implements Registry {
         if (listener == null) {
             throw new IllegalArgumentException("notify listener == null");
         }
-        if ((CollectionUtils.isEmpty(urls))
-                && !ANY_VALUE.equals(url.getServiceInterface())) {
+        if ((CollectionUtils.isEmpty(urls)) && !ANY_VALUE.equals(url.getServiceInterface())) {
             logger.warn("Ignore empty notify urls for subscribe url " + url);
             return;
         }
         if (logger.isInfoEnabled()) {
-            logger.info("Notify urls for subscribe url " + url + ", urls: " + urls);
+            logger.info("Notify (服务端)urls for (消费端)subscribe url " + url + ", urls: " + urls);
         }
         // keep every provider's category.
         Map<String, List<URL>> result = new HashMap<>();
@@ -423,6 +430,7 @@ public abstract class AbstractRegistry implements Registry {
             String category = entry.getKey();
             List<URL> categoryList = entry.getValue();
             categoryNotified.put(category, categoryList);
+            // 调用RegistryDirectory的notify方法，对于providers、configurators、routers三个路径分别调用一次
             listener.notify(categoryList);
             // We will update our cache file after each notification.
             // When our Registry has a subscribe failure due to network jitter, we can return at least the existing cache URL.

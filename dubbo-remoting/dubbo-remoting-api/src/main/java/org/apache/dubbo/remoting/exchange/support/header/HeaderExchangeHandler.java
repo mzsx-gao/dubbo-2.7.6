@@ -57,6 +57,7 @@ public class HeaderExchangeHandler implements ChannelHandlerDelegate {
 
     static void handleResponse(Channel channel, Response response) throws RemotingException {
         if (response != null && !response.isHeartbeat()) {
+            // 如果响应不为空，并且不是心跳事件的响应，则调用received
             DefaultFuture.received(channel, response);
         }
     }
@@ -107,6 +108,8 @@ public class HeaderExchangeHandler implements ChannelHandlerDelegate {
                         res.setStatus(Response.SERVICE_ERROR);
                         res.setErrorMessage(StringUtils.toString(t));
                     }
+                    // 将结果响应到客户端
+                    logger.info("服务端返回信息:" + res.toString());
                     channel.send(res);
                 } catch (RemotingException e) {
                     logger.warn("Send result to consumer failed, channel is " + channel + ", msg is " + e);
@@ -165,6 +168,7 @@ public class HeaderExchangeHandler implements ChannelHandlerDelegate {
     @Override
     public void received(Channel channel, Object message) throws RemotingException {
         final ExchangeChannel exchangeChannel = HeaderExchangeChannel.getOrAddChannel(channel);
+        // 请求数据
         if (message instanceof Request) {
             // handle request.
             Request request = (Request) message;
@@ -177,7 +181,9 @@ public class HeaderExchangeHandler implements ChannelHandlerDelegate {
                     handler.received(exchangeChannel, request.getData());
                 }
             }
-        } else if (message instanceof Response) {
+        }
+        // 响应数据
+        else if (message instanceof Response) {
             handleResponse(channel, (Response) message);
         } else if (message instanceof String) {
             if (isClientSide(channel)) {
