@@ -18,6 +18,7 @@
  */
 package org.apache.dubbo.demo.consumer;
 
+import org.apache.dubbo.config.MetadataReportConfig;
 import org.apache.dubbo.config.RegistryConfig;
 import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;
 import org.apache.dubbo.demo.DemoService;
@@ -52,6 +53,13 @@ public class Application {
             registryConfig.setAddress("zookeeper://127.0.0.1:2181");
             registryConfig.setSimplified(true);
             return registryConfig;
+        }
+
+        @Bean
+        public MetadataReportConfig metadataReportConfig() {
+            MetadataReportConfig metadataReportConfig = new MetadataReportConfig();
+            metadataReportConfig.setAddress("zookeeper://127.0.0.1:2181");
+            return metadataReportConfig;
         }
 
     }

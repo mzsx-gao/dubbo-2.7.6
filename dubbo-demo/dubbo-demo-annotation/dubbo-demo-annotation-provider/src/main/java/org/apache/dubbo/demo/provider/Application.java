@@ -47,12 +47,12 @@ public class Application {
             registryConfig.setSimplified(true);
             return registryConfig;
         }
-//
-//        @Bean
-//        public MetadataReportConfig metadataReportConfig() {
-//            MetadataReportConfig metadataReportConfig = new MetadataReportConfig();
-//            metadataReportConfig.setAddress("zookeeper://localhost:2181");
-//            return metadataReportConfig;
-//        }
+
+        @Bean
+        public MetadataReportConfig metadataReportConfig() {
+            MetadataReportConfig metadataReportConfig = new MetadataReportConfig();
+            metadataReportConfig.setAddress("zookeeper://127.0.0.1:2181");
+            return metadataReportConfig;
+        }
     }
 }

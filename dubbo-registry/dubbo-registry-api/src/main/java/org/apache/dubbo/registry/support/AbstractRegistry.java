@@ -411,7 +411,7 @@ public abstract class AbstractRegistry implements Registry {
             return;
         }
         if (logger.isInfoEnabled()) {
-            logger.info("Notify (服务端)urls for (消费端)subscribe url " + url + ", urls: " + urls);
+            logger.info("服务端通知消费端url变化,就是在这里让消费端拿到服务端的服务地址封装成invokers:Notify urls for subscribe url " + url + ", urls: " + urls);
         }
         // keep every provider's category.
         Map<String, List<URL>> result = new HashMap<>();
