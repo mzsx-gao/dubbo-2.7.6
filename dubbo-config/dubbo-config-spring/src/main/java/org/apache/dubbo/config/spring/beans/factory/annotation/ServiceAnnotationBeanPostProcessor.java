@@ -112,7 +112,7 @@ public class ServiceAnnotationBeanPostProcessor implements BeanDefinitionRegistr
     public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
 
         // @since 2.7.5
-        // 注册监听器DubboBootstrapApplicationListener，主要是在应用启动时进行dubbo服务的到处操作
+        // 注册监听器DubboBootstrapApplicationListener，主要是在应用启动时进行dubbo服务的导出操作
         registerBeans(registry, DubboBootstrapApplicationListener.class);
 
         // 获取扫描包，扫描包可以是多个，所以这里使用了Set集合
