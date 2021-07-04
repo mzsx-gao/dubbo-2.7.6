@@ -7,7 +7,7 @@ import org.apache.dubbo.rpc.*;
 /**
  * 使用方传递了group = peter 则该Filter激活
  */
-@Activate(group = "peter",order = 3)
+@Activate(group = "peter",order = 6)
 public class FilterC implements Filter {
 
     @Override

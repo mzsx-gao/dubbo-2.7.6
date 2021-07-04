@@ -115,13 +115,18 @@ public class ReferenceAnnotationBeanPostProcessor extends AbstractAnnotationBean
         return Collections.unmodifiableMap(injectedMethodReferenceBeanCache);
     }
 
-    // 获取被@Reference注解修饰的字段对应的bean
+    /**
+     * 处理被@Reference注解修饰的字段的依赖注入
+     * 调用地方:
+     * AbstractAnnotationBeanPostProcessor#postProcessPropertyValues -该方法在spring bean对象创建之后，属性填充之前调用
+     * AnnotatedFieldElement#inject#getInjectedObject
+      */
     @Override
     protected Object doGetInjectedBean(AnnotationAttributes attributes, Object bean, String beanName, Class<?> injectedType,
                                        InjectionMetadata.InjectedElement injectedElement) throws Exception {
 
-        // spring容器中被@Service注解标注的类的bean名称，例如:ServiceBean:org.apache.dubbo.demo.DemoService,这个bean是dubbo的
-        // 服务方启动时注册到spring容器中的
+        // spring容器中被@Service注解标注的类的bean名称，例如:ServiceBean:org.apache.dubbo.demo.DemoService,
+        // 这个bean是dubbo的服务方在启动时注册到spring容器中的
         String referencedBeanName = buildReferencedBeanName(attributes, injectedType);
 
         // @Reference 注解标注的字段对应的bean的名字，例如:@Reference org.apache.dubbo.demo.DemoService

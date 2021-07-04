@@ -41,7 +41,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
-@EnableDubboConfig//处理dubbo中全局性的组件配置
+@EnableDubboConfig//创建dubbo的配置类并进行数据绑定
 @DubboComponentScan//负责扫描项目源代码，处理业务类上的@Reference和@Service注解
 public @interface EnableDubbo {
 

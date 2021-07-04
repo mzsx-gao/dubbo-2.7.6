@@ -52,6 +52,4 @@ public class RpcProtocolTest {
         String result = service.sayHello("peter");
         System.out.println(result);
     }
-
-
 }

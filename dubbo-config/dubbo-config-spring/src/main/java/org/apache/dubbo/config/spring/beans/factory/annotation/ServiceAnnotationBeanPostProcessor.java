@@ -160,32 +160,26 @@ public class ServiceAnnotationBeanPostProcessor implements BeanDefinitionRegistr
             scanner.scan(packageToScan);
 
             // Finds all BeanDefinitionHolders of @Service whether @ComponentScan scans or not.
-            Set<BeanDefinitionHolder> beanDefinitionHolders = findServiceBeanDefinitionHolders(scanner, packageToScan, registry, beanNameGenerator);
+            Set<BeanDefinitionHolder> beanDefinitionHolders = findServiceBeanDefinitionHolders(scanner, packageToScan,
+                    registry, beanNameGenerator);
 
             if (!CollectionUtils.isEmpty(beanDefinitionHolders)) {
-
                 for (BeanDefinitionHolder beanDefinitionHolder : beanDefinitionHolders) {
-                    //注册ServiceBean
+                    //注册ServiceBean,这个ServiceBean是dubbo用来对外发布的
                     registerServiceBean(beanDefinitionHolder, registry, scanner);
                 }
-
                 if (logger.isInfoEnabled()) {
                     logger.info(beanDefinitionHolders.size() + " annotated Dubbo's @Service Components { " +
                             beanDefinitionHolders +
                             " } were scanned under package[" + packageToScan + "]");
                 }
-
             } else {
-
                 if (logger.isWarnEnabled()) {
                     logger.warn("No Spring Bean annotating Dubbo's @Service was found under package["
                             + packageToScan + "]");
                 }
-
             }
-
         }
-
     }
 
     /**
@@ -362,14 +356,7 @@ public class ServiceAnnotationBeanPostProcessor implements BeanDefinitionRegistr
     }
 
     /**
-     * Build the {@link AbstractBeanDefinition Bean Definition}
-     *
-     * @param serviceAnnotation
-     * @param serviceAnnotationAttributes
-     * @param interfaceClass
-     * @param annotatedServiceBeanName
-     * @return
-     * @since 2.7.3
+     * 构建ServiceBean对象的BeanDefinition
      */
     private AbstractBeanDefinition buildServiceBeanDefinition(Annotation serviceAnnotation,
                                                               AnnotationAttributes serviceAnnotationAttributes,
