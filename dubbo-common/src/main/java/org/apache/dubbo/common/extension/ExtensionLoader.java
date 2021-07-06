@@ -763,7 +763,12 @@ public class ExtensionLoader<T> {
 
     /**
      * synchronized in getExtensionClasses
-     * 加载所有的拓展类
+     *  获取某个接口的所有实现类；
+     *  1.解析出SPI注解中默认的拓展类名字，放到 cachedDefaultName 中
+     *  2.如果某个实现类被 Adaptive 注解修饰了，那么该类就会被赋值给 cachedAdaptiveClass 变量
+     *  3.如果是包装类，放到 cachedWrapperClasses 中
+     *  4.如果类上有 Activate 注解，cachedActivates 存储 name 到 Activate 注解对象的映射关系
+     *  5.最后全部放在 cachedClasses（Map<String, Class<?>> 配置的key与类的Class对象） 中
      */
     private Map<String, Class<?>> loadExtensionClasses() {
         //解析出SPI注解中默认的拓展类名字，放到 cachedDefaultName 中
@@ -1051,7 +1056,14 @@ public class ExtensionLoader<T> {
      * 获取自适应拓展 Class 对象
      */
     private Class<?> getAdaptiveExtensionClass() {
-        // 获取某个接口的所有实现类,在获取实现类的过程中，如果某个实现类被 Adaptive 注解修饰了，那么该类就会被赋值给cachedAdaptiveClass 变量
+        /**
+         * 获取某个接口的所有实现类；
+         * 1.解析出SPI注解中默认的拓展类名字，放到 cachedDefaultName 中
+         * 2.如果某个实现类被 Adaptive 注解修饰了，那么该类就会被赋值给 cachedAdaptiveClass 变量
+         * 3.如果是包装类，放到 cachedWrapperClasses 中
+         * 4.如果类上有 Activate 注解，cachedActivates 存储 name 到 Activate 注解对象的映射关系
+         * 5.最后全部放在 cachedClasses（Map<String, Class<?>> 配置的key与类的Class对象） 中
+         */
         getExtensionClasses();
         if (cachedAdaptiveClass != null) {
             return cachedAdaptiveClass;

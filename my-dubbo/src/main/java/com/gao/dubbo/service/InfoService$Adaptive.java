@@ -1,4 +1,4 @@
-package com.gao.dubbo.service.proxyCodeDemo;
+package com.gao.dubbo.service;
 
 import org.apache.dubbo.common.extension.ExtensionLoader;
 

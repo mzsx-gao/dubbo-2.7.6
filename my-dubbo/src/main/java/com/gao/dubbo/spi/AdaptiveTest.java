@@ -5,6 +5,7 @@ import com.gao.dubbo.service.OrderService;
 import javassist.ClassPool;
 import org.apache.dubbo.common.URL;
 import org.apache.dubbo.common.extension.ExtensionLoader;
+import org.apache.dubbo.rpc.Protocol;
 import org.junit.Test;
 
 /**
@@ -59,5 +60,12 @@ public class AdaptiveTest {
         URL url = URL.valueOf("test://localhost/test?info.service=b");
         orderService.getDetail("peter",url);
     }
+
+    @Test
+    public void demo() {
+        Protocol protocol = ExtensionLoader.getExtensionLoader(Protocol.class).getAdaptiveExtension();
+        System.out.println(protocol);
+    }
+
 
 }
