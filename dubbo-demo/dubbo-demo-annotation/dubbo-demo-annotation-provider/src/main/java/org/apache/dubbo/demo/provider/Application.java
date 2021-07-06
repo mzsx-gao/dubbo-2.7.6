@@ -43,7 +43,7 @@ public class Application {
         @Bean
         public RegistryConfig registryConfig() {
             RegistryConfig registryConfig = new RegistryConfig();
-            registryConfig.setAddress("zookeeper://127.0.0.1:2181");
+            registryConfig.setAddress("zookeeper://47.103.97.241:2181");
             registryConfig.setSimplified(true);
             return registryConfig;
         }
@@ -51,7 +51,7 @@ public class Application {
         @Bean
         public MetadataReportConfig metadataReportConfig() {
             MetadataReportConfig metadataReportConfig = new MetadataReportConfig();
-            metadataReportConfig.setAddress("zookeeper://127.0.0.1:2181");
+            metadataReportConfig.setAddress("zookeeper://47.103.97.241:2181");
             return metadataReportConfig;
         }
     }

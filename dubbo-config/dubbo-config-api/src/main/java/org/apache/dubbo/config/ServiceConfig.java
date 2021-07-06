@@ -270,7 +270,8 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
             }
             // 检测本地存根类是否可赋值给接口类，若不可赋值则会抛出异常，提醒使用者本地存根类类型不合法
             if (!interfaceClass.isAssignableFrom(localClass)) {
-                throw new IllegalStateException("The local implementation class " + localClass.getName() + " not implement interface " + interfaceName);
+                throw new IllegalStateException("The local implementation class " + localClass.getName() +
+                        " not implement interface " + interfaceName);
             }
         }
         if (stub != null) {
@@ -284,7 +285,8 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
                 throw new IllegalStateException(e.getMessage(), e);
             }
             if (!interfaceClass.isAssignableFrom(stubClass)) {
-                throw new IllegalStateException("The stub implementation class " + stubClass.getName() + " not implement interface " + interfaceName);
+                throw new IllegalStateException("The stub implementation class " + stubClass.getName() + "" +
+                        " not implement interface " + interfaceName);
             }
         }
         checkStubAndLocal(interfaceClass);
