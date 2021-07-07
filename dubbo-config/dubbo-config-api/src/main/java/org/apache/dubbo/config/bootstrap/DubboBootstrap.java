@@ -513,7 +513,10 @@ public class DubboBootstrap extends GenericEventListener {
         useRegistryAsConfigCenterIfNecessary();
         //加载远程配置
         loadRemoteConfigs();
-        //检查全局配置
+        /**
+         * 检查各个配置对象的各个属性设置的值是否合法，检查内容包括是否有非法字符，长度是否超长
+         * 注意，如果配置文件放在配置中心，则配置类对象就是在这里创建，然后调用refresh()方法从配置中心中读取配置给对象赋值
+         */
         checkGlobalConfigs();
         //初始化MetadataService
         initMetadataService();

@@ -190,7 +190,8 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
             bootstrap = DubboBootstrap.getInstance();
             bootstrap.init();
         }
-
+        //对各个Config类的属性进行覆盖，覆盖方式是根据优先级来读取系统属性，外部配置等属性值，然后将这些属性值依次设置到各个Config类中
+        //如果配置类没有，则创建一个，注意这里还会设置ServiceBean的protocols属性和registries属性
         checkAndUpdateSubConfigs();
 
         //init serviceMetadata
@@ -215,6 +216,10 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         dispatch(new ServiceConfigExportedEvent(this));
     }
 
+    /**
+     * 对各个Config类的属性进行覆盖，覆盖方式是根据优先级来读取系统属性，外部配置等属性值，然后将这些属性值依次设置到各个Config类中
+     * 如果配置类没有，则创建一个，注意这里还会设置ServiceBean的protocols属性和registries属性
+     */
     private void checkAndUpdateSubConfigs() {
         // Use default configs defined explicitly with global scope
         completeCompoundConfigs();
