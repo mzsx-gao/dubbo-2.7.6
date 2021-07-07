@@ -62,6 +62,9 @@ public class Environment extends LifecycleAdapter implements FrameworkExt {
 
     @Override
     public void initialize() throws IllegalStateException {
+        //注意configManger中的configsCache属性值来源:
+        //因为AbstractConfig的addIntoConfigManager方法有注解@PostConstruct，因此在AbstractConfig对象创建完毕后，
+        // spring会自动调用addIntoConfigManager方法，在该方法中将配置对象添加到ConfigManager中
         ConfigManager configManager = ApplicationModel.getConfigManager();
         Optional<Collection<ConfigCenterConfig>> defaultConfigs = configManager.getDefaultConfigCenter();
         defaultConfigs.ifPresent(configs -> {

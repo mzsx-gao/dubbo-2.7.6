@@ -454,6 +454,7 @@ public abstract class AbstractConfig implements Serializable {
         this.prefix = prefix;
     }
 
+    //刷新配置
     public void refresh() {
         Environment env = ApplicationModel.getEnvironment();
         try {
@@ -463,6 +464,7 @@ public abstract class AbstractConfig implements Serializable {
             for (Method method : methods) {
                 if (MethodUtils.isSetter(method)) {
                     try {
+                        //从各个数据源获取属性值
                         String value = StringUtils.trim(compositeConfiguration.getString(extractPropertyName(getClass(), method)));
                         // isTypeMatch() is called to avoid duplicate and incorrect update, for example, we have two 'setGeneric' methods in ReferenceConfig.
                         if (StringUtils.isNotEmpty(value) && ClassUtils.isTypeMatch(method.getParameterTypes()[0], value)) {
@@ -573,6 +575,7 @@ public abstract class AbstractConfig implements Serializable {
      *
      * @see ConfigManager#addConfig(AbstractConfig)
      * @since 2.7.5
+     * dubbo中的配置对象在初始化过程对调用此方法把自己设置到configManager的configsCache属性中
      */
     @PostConstruct
     public void addIntoConfigManager() {

@@ -219,6 +219,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         // Use default configs defined explicitly with global scope
         completeCompoundConfigs();
         checkDefault();
+        //内部会设置serviceConfig的protocols属性(协议)
         checkProtocol();
         // init some null configuration.
         List<ConfigInitializer> configInitializers = ExtensionLoader.getExtensionLoader(ConfigInitializer.class)
@@ -227,6 +228,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
 
         // if protocol is not injvm checkRegistry
         if (!isOnlyInJvm()) {
+            //设置serviceConfig的registries（注册中心）
             checkRegistry();
         }
         this.refresh();
@@ -349,7 +351,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         }
 
         // 添加 side、版本、时间戳、进程号、application等信息到 map 中
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put(SIDE_KEY, PROVIDER_SIDE);
         ServiceConfig.appendRuntimeParameters(map);
         AbstractConfig.appendParameters(map, getMetrics());
@@ -365,6 +367,64 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
             map.putIfAbsent(METADATA_KEY, REMOTE_METADATA_STORAGE_TYPE);
         }
         //methods 为 MethodConfig 集合，MethodConfig 中存储了 <dubbo:method> 标签的配置信息,这段代码用于添加 Callback 配置到 map 中
+        handleDubboMethod(map);
+        // 检测 generic 是否为 "true"，并根据检测结果向 map 中添加不同的信息
+        if (ProtocolUtils.isGeneric(generic)) {
+            map.put(GENERIC_KEY, generic);
+            map.put(METHODS_KEY, ANY_VALUE);
+        } else {
+            String revision = Version.getVersion(interfaceClass, version);
+            if (revision != null && revision.length() > 0) {
+                map.put(REVISION_KEY, revision);
+            }
+            // 为接口生成包裹类 Wrapper，Wrapper 中包含了接口的详细信息，比如接口方法名数组，字段信息等
+            String[] methods = Wrapper.getWrapper(interfaceClass).getMethodNames();
+            if (methods.length == 0) {
+                logger.warn("No method found in service interface " + interfaceClass.getName());
+                map.put(METHODS_KEY, ANY_VALUE);
+            } else {
+                // 添加方法名到 map 中，如果包含多个方法名，则用逗号隔开，比如 method = init,destroy
+                map.put(METHODS_KEY, StringUtils.join(new HashSet<>(Arrays.asList(methods)), ","));
+            }
+        }
+
+        /**
+         * Here the token value configured by the provider is used to assign the value to ServiceConfig#token
+         */
+        if(ConfigUtils.isEmpty(token) && provider != null) {
+            token = provider.getToken();
+        }
+
+        if (!ConfigUtils.isEmpty(token)) {
+            if (ConfigUtils.isDefault(token)) {
+                map.put(TOKEN_KEY, UUID.randomUUID().toString());
+            } else {
+                map.put(TOKEN_KEY, token);
+            }
+        }
+        //init serviceMetadata attachments
+        serviceMetadata.getAttachments().putAll(map);
+
+        // 获取 host 和 port
+        String host = findConfigedHosts(protocolConfig, registryURLs, map);
+        Integer port = findConfigedPorts(protocolConfig, name, map);
+        /**
+         * 这里组装好的url示例:
+         * dubbo://192.168.151.2:20888/org.apache.dubbo.demo.DemoService?anyhost=true&application=dubbo-demo-annotation-provider&bind.ip=192.168.151.2
+         * &bind.port=20888&deprecated=false&dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService
+         * &methods=sayHello,sayHelloAsync&pid=2391&release=&side=provider&timestamp=1583830010591
+         */
+        URL url = new URL(name, host, port, getContextPath(protocolConfig).map(p -> p + "/" + path).orElse(path), map);
+
+        /**
+         * 这里是真正的导出服务的代码，这里源码真他妈烂，方法太长了，我把源码中的导出服务部分抽取出来了
+         */
+        url = exportDubboService(registryURLs, url);
+
+        this.urls.add(url);
+    }
+
+    private void handleDubboMethod(Map<String, String> map) {
         if (CollectionUtils.isNotEmpty(getMethods())) {
             for (MethodConfig method : getMethods()) {
                 AbstractConfig.appendParameters(map, method, method.getName());
@@ -420,60 +480,6 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
                 }
             } // end of methods for
         }
-        // 检测 generic 是否为 "true"，并根据检测结果向 map 中添加不同的信息
-        if (ProtocolUtils.isGeneric(generic)) {
-            map.put(GENERIC_KEY, generic);
-            map.put(METHODS_KEY, ANY_VALUE);
-        } else {
-            String revision = Version.getVersion(interfaceClass, version);
-            if (revision != null && revision.length() > 0) {
-                map.put(REVISION_KEY, revision);
-            }
-            // 为接口生成包裹类 Wrapper，Wrapper 中包含了接口的详细信息，比如接口方法名数组，字段信息等
-            String[] methods = Wrapper.getWrapper(interfaceClass).getMethodNames();
-            if (methods.length == 0) {
-                logger.warn("No method found in service interface " + interfaceClass.getName());
-                map.put(METHODS_KEY, ANY_VALUE);
-            } else {
-                // 添加方法名到 map 中，如果包含多个方法名，则用逗号隔开，比如 method = init,destroy
-                map.put(METHODS_KEY, StringUtils.join(new HashSet<>(Arrays.asList(methods)), ","));
-            }
-        }
-
-        /**
-         * Here the token value configured by the provider is used to assign the value to ServiceConfig#token
-         */
-        if(ConfigUtils.isEmpty(token) && provider != null) {
-            token = provider.getToken();
-        }
-
-        if (!ConfigUtils.isEmpty(token)) {
-            if (ConfigUtils.isDefault(token)) {
-                map.put(TOKEN_KEY, UUID.randomUUID().toString());
-            } else {
-                map.put(TOKEN_KEY, token);
-            }
-        }
-        //init serviceMetadata attachments
-        serviceMetadata.getAttachments().putAll(map);
-
-        // 获取 host 和 port
-        String host = findConfigedHosts(protocolConfig, registryURLs, map);
-        Integer port = findConfigedPorts(protocolConfig, name, map);
-        /**
-         * 这里组装好的url示例:
-         * dubbo://192.168.151.2:20888/org.apache.dubbo.demo.DemoService?anyhost=true&application=dubbo-demo-annotation-provider&bind.ip=192.168.151.2
-         * &bind.port=20888&deprecated=false&dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService
-         * &methods=sayHello,sayHelloAsync&pid=2391&release=&side=provider&timestamp=1583830010591
-         */
-        URL url = new URL(name, host, port, getContextPath(protocolConfig).map(p -> p + "/" + path).orElse(path), map);
-
-        /**
-         * 这里是真正的导出服务的代码，这里源码真他妈烂，方法太长了，我把源码中的导出服务部分抽取出来了
-         */
-        url = exportDubboService(registryURLs, url);
-
-        this.urls.add(url);
     }
 
     /**

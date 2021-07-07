@@ -334,6 +334,7 @@ public class ConfigManager extends LifecycleAdapter implements FrameworkExt {
         }).collect(Collectors.toSet());
     }
 
+    //刷新配置类的属性
     public void refreshAll() {
         write(() -> {
             // refresh all configs here,
