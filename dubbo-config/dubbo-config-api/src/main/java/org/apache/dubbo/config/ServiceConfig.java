@@ -573,7 +573,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         if (StringUtils.isNotEmpty(proxy)) {
             registryURL = registryURL.addParameter(PROXY_KEY, proxy);
         }
-        // 为服务提供类(ref)生成 Invoker
+        // 为服务提供类(ref)生成 Invoker,此处获取到的Invoker是最终调用目标类的代理类，是一个动态生成的一个包装类
         Invoker<?> invoker = PROXY_FACTORY.getInvoker(ref, (Class) interfaceClass, registryURL.addParameterAndEncoded(EXPORT_KEY, url.toFullString()));
         DelegateProviderMetaDataInvoker wrapperInvoker = new DelegateProviderMetaDataInvoker(invoker, this);
         // 导出服务，并生成 Exporter
