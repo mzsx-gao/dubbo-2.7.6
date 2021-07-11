@@ -40,7 +40,7 @@ public class Application {
     @PropertySource("classpath:/spring/dubbo-provider.properties")
     static class ProviderConfiguration {
 
-        @Bean
+//        @Bean
         public RegistryConfig registryConfig() {
             RegistryConfig registryConfig = new RegistryConfig();
             registryConfig.setAddress("zookeeper://47.103.97.241:2181");
@@ -49,7 +49,7 @@ public class Application {
             return registryConfig;
         }
 
-        @Bean
+//        @Bean
         public MetadataReportConfig metadataReportConfig() {
             MetadataReportConfig metadataReportConfig = new MetadataReportConfig();
             metadataReportConfig.setAddress("zookeeper://47.103.97.241:2181");
