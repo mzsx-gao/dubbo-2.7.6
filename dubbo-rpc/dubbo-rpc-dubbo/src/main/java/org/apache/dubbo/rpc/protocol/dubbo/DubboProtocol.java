@@ -281,7 +281,7 @@ public class DubboProtocol extends AbstractProtocol {
     }
 
     /**
-     * 导出服务
+     * 暴露服务
      */
     @Override
     public <T> Exporter<T> export(Invoker<T> invoker) throws RpcException {

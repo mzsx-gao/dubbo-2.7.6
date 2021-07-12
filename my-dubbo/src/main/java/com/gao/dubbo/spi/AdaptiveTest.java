@@ -61,11 +61,4 @@ public class AdaptiveTest {
         orderService.getDetail("peter",url);
     }
 
-    @Test
-    public void demo() {
-        Protocol protocol = ExtensionLoader.getExtensionLoader(Protocol.class).getAdaptiveExtension();
-        System.out.println(protocol);
-    }
-
-
 }
