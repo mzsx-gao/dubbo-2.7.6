@@ -372,7 +372,8 @@ public class CuratorZookeeperClient extends AbstractZookeeperClient<CuratorZooke
                 CuratorZookeeperClient.this.stateChanged(StateListener.SUSPENDED);
             } else if (state == ConnectionState.CONNECTED) {
                 lastSessionId = sessionId;
-                logger.info("Curator zookeeper client instance initiated successfully, session id is " + Long.toHexString(sessionId));
+//                logger.info("Curator zookeeper client instance initiated successfully, session id is " + Long.toHexString(sessionId));
+                logger.info("Curator客户端实例初始化成功, session id is " + Long.toHexString(sessionId));
                 CuratorZookeeperClient.this.stateChanged(StateListener.CONNECTED);
             } else if (state == ConnectionState.RECONNECTED) {
                 if (lastSessionId == sessionId && sessionId != UNKNOWN_SESSION_ID) {

@@ -282,6 +282,7 @@ public class DubboProtocol extends AbstractProtocol {
 
     /**
      * 暴露服务
+     * 完成netty服务端的启动，建立handler的链式关系
      */
     @Override
     public <T> Exporter<T> export(Invoker<T> invoker) throws RpcException {

@@ -1,6 +1,7 @@
 package com.gao.dubbo.spi;
 
 import org.apache.dubbo.common.extension.ExtensionLoader;
+import org.apache.dubbo.remoting.Transporter;
 import org.apache.dubbo.rpc.Protocol;
 import org.apache.dubbo.rpc.ProxyFactory;
 import org.junit.Test;
@@ -25,4 +26,11 @@ public class Z_MyTest {
         ProxyFactory PROXY_FACTORY = ExtensionLoader.getExtensionLoader(ProxyFactory.class).getAdaptiveExtension();
         System.out.println(PROXY_FACTORY);
     }
+
+    @Test
+    public void getTransporter() {
+        Transporter transporter = ExtensionLoader.getExtensionLoader(Transporter .class).getAdaptiveExtension();
+        System.out.println(transporter);
+    }
+
 }

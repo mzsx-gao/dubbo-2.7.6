@@ -343,7 +343,6 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
                     .orElse(path), group, version);
             // In case user specified path, register service one more time to map it to path.
             repository.registerService(pathKey, interfaceClass);
-            // TODO, uncomment this line once service key is unified
             serviceMetadata.setServiceKey(pathKey);
             doExportUrlsFor1Protocol(protocolConfig, registryURLs);
         }
@@ -500,11 +499,11 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         }
         String scope = url.getParameter(SCOPE_KEY);
         if (!SCOPE_NONE.equalsIgnoreCase(scope)) {
-            // scope != remote，导出到本地
+            // scope != remote，暴露到本地
             if (!SCOPE_REMOTE.equalsIgnoreCase(scope)) {
                 exportLocal(url);
             }
-            // scope != local，导出到远程
+            // scope != local，暴露到远程
             if (!SCOPE_LOCAL.equalsIgnoreCase(scope)) {
                 if (CollectionUtils.isNotEmpty(registryURLs)) {
                     for (URL registryURL : registryURLs) {
@@ -575,7 +574,6 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
             registryURL = registryURL.addParameter(PROXY_KEY, proxy);
         }
         // 为服务提供类(ref)生成 Invoker,此处获取到的Invoker是最终调用目标类的代理类，是一个动态生成的一个包装类，
-        // 可以这么理解，拥有这个Invoker对象才能调到目标对象service
         registryURL = registryURL.addParameterAndEncoded(EXPORT_KEY, url.toFullString());
         Invoker<?> invoker = PROXY_FACTORY.getInvoker(ref, (Class) interfaceClass,registryURL);
 

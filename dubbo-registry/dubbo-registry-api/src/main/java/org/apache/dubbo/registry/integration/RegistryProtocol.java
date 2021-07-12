@@ -185,9 +185,9 @@ public class RegistryProtocol implements Protocol {
 
     /**
      * 暴露服务到远程，并生成 Exporter,核心是干了两件事；1.暴露服务(即启动netty服务器) 2.向注册中心注册服务
-     * 1.获得服务提供者的url，再通过override数据重新配置url，然后执行doLocalExport()进行服务暴露。
-     * 2.加载注册中心实现类，向注册中心注册服务。
-     * 3.向注册中心进行订阅 override 数据。
+     * 1.获得服务提供者的url，再通过override数据重新配置url，然后执行doLocalExport()进行服务暴露
+     * 2.加载注册中心实现类，向注册中心注册服务
+     * 3.向注册中心进行订阅 override 数据
      * 4.创建并返回 DestroyableExporter
      */
     @Override
@@ -215,15 +215,17 @@ public class RegistryProtocol implements Protocol {
         final OverrideListener overrideSubscribeListener = new OverrideListener(overrideSubscribeUrl, originInvoker);
         // 把监听器添加到集合
         overrideListeners.put(overrideSubscribeUrl, overrideSubscribeListener);
+
         // 根据override的配置来覆盖原来的url，使得配置是最新的
         providerUrl = overrideUrlWithConfig(providerUrl, overrideSubscribeListener);
-
-        //1.暴露服务
+        //1.暴露服务，其实就是启动netty服务端
         final ExporterChangeableWrapper<T> exporter = doLocalExport(originInvoker, providerUrl);
 
         // 根据 URL 加载 Registry 实现类，比如ZookeeperRegistry
         final Registry registry = getRegistry(originInvoker);
-        // 返回注册到注册表的url并过滤url参数一次
+        // 获取将要注册到zookeeper下providers节点下的url
+        // 例如:dubbo://192.168.15.1:20888/org.apache.dubbo.demo.DemoService?application=dubbo-demo-annotation-provider
+        // &deprecated=false&dubbo=2.0.2&timeout=6000&timestamp=1626102051421
         final URL registeredProviderUrl = getUrlToRegistry(providerUrl, registryUrl);
         // 获取 register 参数
         boolean register = providerUrl.getParameter(REGISTER_KEY, true);

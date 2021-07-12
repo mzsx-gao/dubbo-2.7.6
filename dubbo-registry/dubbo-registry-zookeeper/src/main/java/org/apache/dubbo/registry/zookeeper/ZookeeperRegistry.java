@@ -128,6 +128,10 @@ public class ZookeeperRegistry extends FailbackRegistry {
     @Override
     public void doRegister(URL url) {
         try {
+            // 创建服务名称的节点，例如:
+            // /dubbo/org.apache.dubbo.demo.DemoService/providers/dubbo://192.168.15.1:20888/
+            // org.apache.dubbo.demo.DemoService?application=dubbo-demo-annotation-provider&deprecated=false&dubbo=2.0.2
+            // &timeout=6000&timestamp=1626103195190
             zkClient.create(toUrlPath(url), url.getParameter(DYNAMIC_KEY, true));
         } catch (Throwable e) {
             throw new RpcException("Failed to register " + url + " to zookeeper " + getUrl() + ", cause: " + e.getMessage(), e);

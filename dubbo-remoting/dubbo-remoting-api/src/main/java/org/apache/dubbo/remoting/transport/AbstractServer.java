@@ -74,7 +74,8 @@ public abstract class AbstractServer extends AbstractEndpoint implements Remotin
             // 调用模板方法 doOpen 启动服务器
             doOpen();
             if (logger.isInfoEnabled()) {
-                logger.info("Start " + getClass().getSimpleName() + " bind " + getBindAddress() + ", export " + getLocalAddress());
+                logger.info("服务端已启动:Start " + getClass().getSimpleName() + " bind " + getBindAddress()
+                        + ", export " + getLocalAddress());
             }
         } catch (Throwable t) {
             throw new RemotingException(url.toInetSocketAddress(), null, "Failed to bind " + getClass().getSimpleName()

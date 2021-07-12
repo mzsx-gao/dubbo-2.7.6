@@ -59,9 +59,10 @@ public class ProtocolListenerWrapper implements Protocol {
         if (UrlUtils.isRegistry(invoker.getUrl())) {
             return protocol.export(invoker);
         }
-        return new ListenerExporterWrapper<T>(protocol.export(invoker),
-                Collections.unmodifiableList(ExtensionLoader.getExtensionLoader(ExporterListener.class)
-                        .getActivateExtension(invoker.getUrl(), EXPORTER_LISTENER_KEY)));
+        //服务发布监听包装类，其实就是提供一个扩展，服务发布后给一个通知,ExportListener在dubbo中默认没有实现类，可以自己通过SPI去扩展
+        List<ExporterListener> exporterListeners = Collections.unmodifiableList(
+                ExtensionLoader.getExtensionLoader(ExporterListener.class).getActivateExtension(invoker.getUrl(), EXPORTER_LISTENER_KEY));
+        return new ListenerExporterWrapper<T>(protocol.export(invoker),exporterListeners);
     }
 
     @Override
