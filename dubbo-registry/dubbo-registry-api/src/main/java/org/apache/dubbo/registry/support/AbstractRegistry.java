@@ -411,7 +411,8 @@ public abstract class AbstractRegistry implements Registry {
             return;
         }
         if (logger.isInfoEnabled()) {
-            logger.info("服务端通知消费端url变化,就是在这里让消费端拿到服务端的服务地址封装成invokers:Notify urls for subscribe url " + url + ", urls: " + urls);
+            //就是在这里让消费端拿到服务端的服务地址封装成invokers
+            logger.info("通知url变化:Notify urls for subscribe url " + url + ", urls: " + urls);
         }
         // keep every provider's category.
         Map<String, List<URL>> result = new HashMap<>();
@@ -425,12 +426,14 @@ public abstract class AbstractRegistry implements Registry {
         if (result.size() == 0) {
             return;
         }
+        //获取缓存中的override协议的list
         Map<String, List<URL>> categoryNotified = notified.computeIfAbsent(url, u -> new ConcurrentHashMap<>());
         for (Map.Entry<String, List<URL>> entry : result.entrySet()) {
             String category = entry.getKey();
             List<URL> categoryList = entry.getValue();
+            //覆盖notified缓存
             categoryNotified.put(category, categoryList);
-            // 调用OverrideListener的notify方法
+            // 调用NotifyListener的notify方法
             listener.notify(categoryList);
             // We will update our cache file after each notification.
             // When our Registry has a subscribe failure due to network jitter, we can return at least the existing cache URL.

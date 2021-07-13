@@ -1,6 +1,9 @@
 package com.gao.dubbo.spi;
 
+import org.apache.dubbo.common.URL;
 import org.apache.dubbo.common.extension.ExtensionLoader;
+import org.apache.dubbo.registry.Registry;
+import org.apache.dubbo.registry.RegistryFactory;
 import org.apache.dubbo.remoting.Transporter;
 import org.apache.dubbo.rpc.Protocol;
 import org.apache.dubbo.rpc.ProxyFactory;
@@ -31,6 +34,13 @@ public class Z_MyTest {
     public void getTransporter() {
         Transporter transporter = ExtensionLoader.getExtensionLoader(Transporter .class).getAdaptiveExtension();
         System.out.println(transporter);
+    }
+
+    @Test
+    public void overrideUrl() {
+        RegistryFactory registryFactory = ExtensionLoader.getExtensionLoader(RegistryFactory.class).getAdaptiveExtension();
+        Registry registry = registryFactory.getRegistry(URL.valueOf("zookeeper://47.103.97.241:2181"));
+        registry.register(URL.valueOf("override://0.0.0.0/org.apache.dubbo.demo.DemoService?category=configurators&compatible_config=true&dynamic=false&enabled=true&timeout=6600"));
     }
 
 }

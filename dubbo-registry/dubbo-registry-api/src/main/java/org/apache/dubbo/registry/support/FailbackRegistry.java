@@ -353,6 +353,7 @@ public abstract class FailbackRegistry extends AbstractRegistry {
         }
     }
 
+    //监听的节点有变化会调过来
     @Override
     protected void notify(URL url, NotifyListener listener, List<URL> urls) {
         if (url == null) {

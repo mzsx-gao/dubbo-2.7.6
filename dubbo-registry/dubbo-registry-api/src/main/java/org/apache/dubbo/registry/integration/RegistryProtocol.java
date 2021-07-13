@@ -285,7 +285,7 @@ public class RegistryProtocol implements Protocol {
     }
 
     /**
-     * Reexport the invoker of the modified url
+     * 用修改过的url重新暴露服务
      *
      * @param originInvoker
      * @param newInvokerUrl
@@ -299,11 +299,11 @@ public class RegistryProtocol implements Protocol {
         URL registryUrl = getRegistryUrl(originInvoker);
         URL newProviderUrl = getUrlToRegistry(newInvokerUrl, registryUrl);
 
-        // update local exporter
+        //修改ExporterChangeableWrapper中持有的DubboExporter
         Invoker<T> invokerDelegate = new InvokerDelegate<T>(originInvoker, newInvokerUrl);
         exporter.setExporter(protocol.export(invokerDelegate));
 
-        // update registry
+        //修改zookeeper上保存的服务信息
         if (!newProviderUrl.equals(registeredUrl)) {
             if (getProviderUrl(originInvoker).getParameter(REGISTER_KEY, true)) {
                 Registry registry = getRegistry(originInvoker);

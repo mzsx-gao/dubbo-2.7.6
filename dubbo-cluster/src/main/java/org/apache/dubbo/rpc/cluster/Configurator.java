@@ -80,6 +80,7 @@ public interface Configurator extends Comparable<Configurator> {
         List<Configurator> configurators = new ArrayList<>(urls.size());
         for (URL url : urls) {
             if (EMPTY_PROTOCOL.equals(url.getProtocol())) {
+                //empty协议清空configurators
                 configurators.clear();
                 break;
             }
