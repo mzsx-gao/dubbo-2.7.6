@@ -47,20 +47,20 @@ public class Application {
     @ComponentScan(value = {"org.apache.dubbo.demo.consumer.comp"})
     static class ConsumerConfiguration {
 
-        @Bean
-        public RegistryConfig registryConfig() {
-            RegistryConfig registryConfig = new RegistryConfig();
-            registryConfig.setAddress("zookeeper://127.0.0.1:2181");
-            registryConfig.setSimplified(true);
-            return registryConfig;
-        }
-
-        @Bean
-        public MetadataReportConfig metadataReportConfig() {
-            MetadataReportConfig metadataReportConfig = new MetadataReportConfig();
-            metadataReportConfig.setAddress("zookeeper://127.0.0.1:2181");
-            return metadataReportConfig;
-        }
+//        @Bean
+//        public RegistryConfig registryConfig() {
+//            RegistryConfig registryConfig = new RegistryConfig();
+//            registryConfig.setAddress("zookeeper://127.0.0.1:2181");
+//            registryConfig.setSimplified(true);
+//            return registryConfig;
+//        }
+//
+//        @Bean
+//        public MetadataReportConfig metadataReportConfig() {
+//            MetadataReportConfig metadataReportConfig = new MetadataReportConfig();
+//            metadataReportConfig.setAddress("zookeeper://127.0.0.1:2181");
+//            return metadataReportConfig;
+//        }
 
     }
 }

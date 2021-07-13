@@ -277,6 +277,7 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
                 List<RegistryConfig> registryConfigs = ApplicationModel.getConfigManager().getDefaultRegistries();
                 if (registryConfigs.isEmpty()) {
                     registryConfigs = new ArrayList<>();
+                    //如果注册中心配置放在配置中心里，则RegistryConfig就是在这里初始化
                     RegistryConfig registryConfig = new RegistryConfig();
                     registryConfig.refresh();
                     registryConfigs.add(registryConfig);

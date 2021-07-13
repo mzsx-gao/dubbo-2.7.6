@@ -304,8 +304,8 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
      *   配置url后将url并且保存到urls里面，否则就合并url，并且保存到urls。
      * 3.如果是通过注册中心来进行调用，则先校验所有的注册中心，然后加载注册中心的url，遍历每个url，加入监控中心url配置，最后把每个url保存到urls。
      * 4.针对urls集合的数量，如果是单注册中心，直接引用RegistryProtocol 的 refer 构建 Invoker 实例，如果是多注册中心，则对每个url都生成Invoker，
-     *    利用集群进行多个Invoker合并。
-     * 5.最终输出一个invoker。
+     *   利用集群进行多个Invoker合并。
+     * 5.最终输出一个invoker
      */
     private T createProxy(Map<String, String> map) {
         // 根据配置检查是否为本地调用
@@ -347,7 +347,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
             else { // assemble URL from register center's configuration
                 // if protocols not injvm checkRegistry
                 if (!LOCAL_PROTOCOL.equalsIgnoreCase(getProtocol())) {
-                    // 校验注册中心
+                    // 校验注册中心，如果注册中心配置在配置中心里，则注册中心配置就是在这里加载
                     checkRegistry();
                     // 加载注册中心的url
                     List<URL> us = ConfigValidationUtils.loadRegistries(this, false);
