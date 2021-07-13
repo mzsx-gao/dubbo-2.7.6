@@ -243,7 +243,8 @@ public class RegistryProtocol implements Protocol {
         exporter.setSubscribeUrl(overrideSubscribeUrl);
 
         notifyExport(exporter);
-        //Ensure that a new exporter instance is returned every time export
+
+        //创建并返回DestroyableExporter
         return new DestroyableExporter<>(exporter);
     }
 
@@ -632,8 +633,7 @@ public class RegistryProtocol implements Protocol {
         public synchronized void notify(List<URL> urls) {
             logger.debug("original override urls: " + urls);
 
-            List<URL> matchedUrls = getMatchedUrls(urls, subscribeUrl.addParameter(CATEGORY_KEY,
-                    CONFIGURATORS_CATEGORY));
+            List<URL> matchedUrls = getMatchedUrls(urls, subscribeUrl.addParameter(CATEGORY_KEY, CONFIGURATORS_CATEGORY));
             logger.debug("subscribe url: " + subscribeUrl + ", override urls: " + matchedUrls);
 
             // No matching results
@@ -641,8 +641,8 @@ public class RegistryProtocol implements Protocol {
                 return;
             }
 
-            this.configurators = Configurator.toConfigurators(classifyUrls(matchedUrls, UrlUtils::isConfigurator))
-                    .orElse(configurators);
+            this.configurators =
+                Configurator.toConfigurators(classifyUrls(matchedUrls, UrlUtils::isConfigurator)).orElse(configurators);
 
             doOverrideIfNecessary();
         }
@@ -664,12 +664,12 @@ public class RegistryProtocol implements Protocol {
             }
             //The current, may have been merged many times
             URL currentUrl = exporter.getInvoker().getUrl();
-            //Merged with this configuration
+            //用override配置覆盖currentUrl
             URL newUrl = getConfigedInvokerUrl(configurators, currentUrl);
             newUrl = getConfigedInvokerUrl(providerConfigurationListener.getConfigurators(), newUrl);
-            newUrl = getConfigedInvokerUrl(serviceConfigurationListeners.get(originUrl.getServiceKey())
-                    .getConfigurators(), newUrl);
+            newUrl = getConfigedInvokerUrl(serviceConfigurationListeners.get(originUrl.getServiceKey()).getConfigurators(), newUrl);
             if (!currentUrl.equals(newUrl)) {
+                //重新暴露服务
                 RegistryProtocol.this.reExport(originInvoker, newUrl);
                 logger.info("exported provider url changed, origin url: " + originUrl +
                         ", old export url: " + currentUrl + ", new export url: " + newUrl);
