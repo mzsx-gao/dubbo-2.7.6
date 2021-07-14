@@ -85,7 +85,7 @@ public class MockClusterInvoker<T> implements Invoker<T> {
         // 强制降级
         else if (value.startsWith("force")) {
             if (logger.isWarnEnabled()) {
-                logger.warn("force-mock: " + invocation.getMethodName() + " force-mock enabled , url : " + getUrl());
+                logger.warn("强制降级force-mock: " + invocation.getMethodName() + " force-mock enabled , url : " + getUrl());
             }
             //force:direct mock
             result = doMockInvoke(invocation, null);
@@ -110,7 +110,7 @@ public class MockClusterInvoker<T> implements Invoker<T> {
                     throw e;
                 }
                 if (logger.isWarnEnabled()) {
-                    logger.warn("fail-mock: " + invocation.getMethodName() + " fail-mock enabled , url : " + getUrl(), e);
+                    logger.warn("调用失败，服务降级: " + invocation.getMethodName() + " fail-mock enabled , url : " + getUrl(), e);
                 }
                 // 如果调用失败，则服务降级
                 result = doMockInvoke(invocation, e);
@@ -119,17 +119,21 @@ public class MockClusterInvoker<T> implements Invoker<T> {
         return result;
     }
 
+    //服务降级
     private Result doMockInvoke(Invocation invocation, RpcException e) {
         Result result = null;
         Invoker<T> minvoker;
 
+        // 路由匹配 Mock Invoker 集合
         List<Invoker<T>> mockInvokers = selectMockInvoker(invocation);
+        // 如果mockInvokers为空，则创建一个MockInvoker
         if (CollectionUtils.isEmpty(mockInvokers)) {
             minvoker = (Invoker<T>) new MockInvoker(getUrl(), directory.getInterface());
         } else {
             minvoker = mockInvokers.get(0);
         }
         try {
+            // 调用invoke
             result = minvoker.invoke(invocation);
         } catch (RpcException me) {
             if (me.isBiz()) {

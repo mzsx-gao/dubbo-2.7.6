@@ -28,6 +28,11 @@ import java.util.concurrent.CompletableFuture;
 
 @Component("demoServiceComponent")
 public class DemoServiceComponent implements DemoService {
+
+//    @Reference(mock = "true")
+//    @Reference(mock = "org.apache.dubbo.demo.DemoServiceMock")
+//    @Reference(mock = "return {\"hello\":\"world\"}")
+//    @Reference(mock = "force:return mock降级")
     @Reference
     private DemoService demoService;
 

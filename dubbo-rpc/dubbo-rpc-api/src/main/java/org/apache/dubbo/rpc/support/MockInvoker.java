@@ -110,6 +110,8 @@ final public class MockInvoker<T> implements Invoker<T> {
             throw new RpcException(new IllegalAccessException("mock can not be null. url :" + url));
         }
         mock = normalizeMock(URL.decode(mock));
+
+        //使用 return 来返回一个字符串表示的对象，作为 Mock 的返回值
         if (mock.startsWith(RETURN_PREFIX)) {
             mock = mock.substring(RETURN_PREFIX.length()).trim();
             try {
@@ -159,6 +161,7 @@ final public class MockInvoker<T> implements Invoker<T> {
         }
     }
 
+    //将mock实现包装成代理类Invoker,可以调用
     @SuppressWarnings("unchecked")
     private Invoker<T> getInvoker(String mockService) {
         Invoker<T> invoker = (Invoker<T>) MOCK_MAP.get(mockService);
@@ -168,6 +171,7 @@ final public class MockInvoker<T> implements Invoker<T> {
 
         Class<T> serviceType = (Class<T>) ReflectUtils.forName(url.getServiceInterface());
         T mockObject = (T) getMockObject(mockService, serviceType);
+        //生成代理类
         invoker = PROXY_FACTORY.getInvoker(mockObject, serviceType, url);
         if (MOCK_MAP.size() < 10000) {
             MOCK_MAP.put(mockService, invoker);
@@ -175,6 +179,7 @@ final public class MockInvoker<T> implements Invoker<T> {
         return invoker;
     }
 
+    //获取mock的实现类
     @SuppressWarnings("unchecked")
     public static Object getMockObject(String mockService, Class serviceType) {
         if (ConfigUtils.isDefault(mockService)) {

@@ -37,7 +37,7 @@ public class Application {
         System.out.println("客户端启动成功");
         DemoService service = context.getBean("demoServiceComponent", DemoServiceComponent.class);
         String hello = service.sayHello("world");
-        System.out.println("服务端返回结果result :" + hello);
+        System.out.println("返回结果result :" + hello);
         System.in.read();
     }
 
