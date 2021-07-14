@@ -7,6 +7,7 @@ import org.apache.dubbo.registry.RegistryFactory;
 import org.apache.dubbo.remoting.Transporter;
 import org.apache.dubbo.rpc.Protocol;
 import org.apache.dubbo.rpc.ProxyFactory;
+import org.apache.dubbo.rpc.cluster.Cluster;
 import org.junit.Test;
 
 /**
@@ -26,14 +27,20 @@ public class Z_MyTest {
 
     @Test
     public void getProxyFactory() {
-        ProxyFactory PROXY_FACTORY = ExtensionLoader.getExtensionLoader(ProxyFactory.class).getAdaptiveExtension();
-        System.out.println(PROXY_FACTORY);
+        ProxyFactory proxyFactory = ExtensionLoader.getExtensionLoader(ProxyFactory.class).getAdaptiveExtension();
+        System.out.println(proxyFactory);
     }
 
     @Test
     public void getTransporter() {
         Transporter transporter = ExtensionLoader.getExtensionLoader(Transporter .class).getAdaptiveExtension();
         System.out.println(transporter);
+    }
+
+    @Test
+    public void cluster() {
+        Cluster cluster = ExtensionLoader.getExtensionLoader(Cluster.class).getAdaptiveExtension();
+        System.out.println(cluster);
     }
 
     @Test

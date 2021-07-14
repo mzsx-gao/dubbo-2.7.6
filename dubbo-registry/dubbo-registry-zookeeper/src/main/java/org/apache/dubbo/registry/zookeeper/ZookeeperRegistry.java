@@ -202,8 +202,7 @@ public class ZookeeperRegistry extends FailbackRegistry {
                     zkClient.create(path, false);
                     List<String> children = zkClient.addChildListener(path, zkListener);
                     if (children != null) {
-                        //toUrlsWithEmpty:如果configurations目录下有override信息，则返回的url是override://开头的，
-                        //否则是empty://开头的
+                        //toUrlsWithEmpty:如果path目录下有信息，则返回的url不变，否则是构建empty://开头的url
                         urls.addAll(toUrlsWithEmpty(url, path, children));
                     }
                 }

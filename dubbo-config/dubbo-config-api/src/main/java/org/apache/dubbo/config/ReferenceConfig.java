@@ -413,7 +413,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
                     + NetUtils.getLocalHost() + " use dubbo version " + Version.getVersion());
         }
         if (logger.isInfoEnabled()) {
-            logger.info("Refer dubbo service " + interfaceClass.getName() + " from url " + invoker.getUrl());
+            logger.info("引用dubbo服务: " + interfaceClass.getName() + " from url " + invoker.getUrl());
         }
         /**
          * @since 2.7.0
