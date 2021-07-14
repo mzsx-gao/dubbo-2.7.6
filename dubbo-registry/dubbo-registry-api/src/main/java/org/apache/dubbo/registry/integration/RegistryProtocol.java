@@ -471,7 +471,13 @@ public class RegistryProtocol implements Protocol {
         URL subscribeUrl = new URL(CONSUMER_PROTOCOL, parameters.remove(REGISTER_IP_KEY), 0, type.getName(), parameters);
         if (directory.isShouldRegister()) {
             directory.setRegisteredConsumerUrl(subscribeUrl);
-            // 注册服务消费者
+            //
+            /**
+             * 注册服务消费者，注册到consumers目录下：
+             * consumer://172.19.7.245/org.apache.dubbo.demo.DemoService?application=dubbo-demo-annotation-consumer
+             * &category=consumers&check=false&dubbo=2.0.2&init=false&interface=org.apache.dubbo.demo.DemoService
+             * &metadata-type=remote&methods=sayHello,sayHelloAsync&pid=44961&side=consumer&sticky=false&timestamp=1626226005453
+             */
             registry.register(directory.getRegisteredConsumerUrl());
         }
         // 创建路由规则链
