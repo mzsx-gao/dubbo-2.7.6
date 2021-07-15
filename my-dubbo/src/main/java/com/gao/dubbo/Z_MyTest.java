@@ -1,4 +1,4 @@
-package com.gao.dubbo.spi;
+package com.gao.dubbo;
 
 import org.apache.dubbo.common.URL;
 import org.apache.dubbo.common.extension.ExtensionLoader;
@@ -8,7 +8,12 @@ import org.apache.dubbo.remoting.Transporter;
 import org.apache.dubbo.rpc.Protocol;
 import org.apache.dubbo.rpc.ProxyFactory;
 import org.apache.dubbo.rpc.cluster.Cluster;
+import org.apache.dubbo.rpc.cluster.Router;
+import org.apache.dubbo.rpc.cluster.RouterFactory;
 import org.junit.Test;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 名称: Z_MyTest
@@ -50,4 +55,25 @@ public class Z_MyTest {
         registry.register(URL.valueOf("override://0.0.0.0/org.apache.dubbo.demo.DemoService?category=configurators&compatible_config=true&dynamic=false&enabled=true&timeout=6600"));
     }
 
+    @Test
+    public void registryRoutes() {
+        RegistryFactory registryFactory = ExtensionLoader.getExtensionLoader(RegistryFactory.class).getAdaptiveExtension();
+        Registry registry = registryFactory.getRegistry(URL.valueOf("zookeeper://47.103.97.241:2181"));
+        URL routeUrl = URL.valueOf("route://0.0.0.0/org.apache.dubbo.demo.DemoService?category=routers&dynamic=false&enabled=true&force=true&name=null&priority=0&router=condition&rule=+%3D%3E+host+%21%3D+172.19.7.245&runtime=false");
+        registry.register(routeUrl);
+    }
+
+    @Test
+    public void getRoutes() {
+        URL url = URL.valueOf("consumer://172.19.7.245/org.apache.dubbo.demo.DemoService?" +
+            "application=dubbo-demo-annotation-consumer&dubbo=2.0.2&init=false&" +
+            "interface=org.apache.dubbo.demo.DemoService&metadata-type=remote&" +
+            "methods=sayHello,sayHelloAsync&pid=74970&side=consumer&sticky=false&timestamp=1626339835181");
+        List<RouterFactory> extensionFactories = ExtensionLoader.getExtensionLoader(RouterFactory.class)
+            .getActivateExtension(url, "router");
+        List<Router> routers = extensionFactories.stream()
+            .map(factory -> factory.getRouter(url))
+            .collect(Collectors.toList());
+        System.out.println(routers);
+    }
 }

@@ -185,6 +185,7 @@ public class ConditionRouter extends AbstractRouter {
                 return result;
             }
             for (Invoker<T> invoker : invokers) {
+                //判断条件是否匹配
                 if (matchThen(invoker.getUrl(), url)) {
                     result.add(invoker);
                 }
