@@ -41,11 +41,11 @@ public final class Version {
     private static final Pattern PREFIX_DIGITS_PATTERN = Pattern.compile("^([0-9]*).*");
 
     // Dubbo RPC protocol version, for compatibility, it must not be between 2.0.10 ~ 2.6.2
-    public static final String DEFAULT_DUBBO_PROTOCOL_VERSION = "2.0.2";
+    public static final String DEFAULT_DUBBO_PROTOCOL_VERSION = "2.7.6";
     // version 1.0.0 represents Dubbo rpc protocol before v2.6.2
     public static final int LEGACY_DUBBO_PROTOCOL_VERSION = 10000; // 1.0.0
     // Dubbo implementation version, usually is jar version.
-    private static final String VERSION = getVersion(Version.class, "");
+    private static final String VERSION = getVersion(Version.class, "2.7.6");
 
     /**
      * For protocol compatibility purpose.

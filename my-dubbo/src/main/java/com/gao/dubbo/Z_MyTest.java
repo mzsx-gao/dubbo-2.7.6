@@ -59,7 +59,7 @@ public class Z_MyTest {
     public void registryRoutes() {
         RegistryFactory registryFactory = ExtensionLoader.getExtensionLoader(RegistryFactory.class).getAdaptiveExtension();
         Registry registry = registryFactory.getRegistry(URL.valueOf("zookeeper://47.103.97.241:2181"));
-        URL routeUrl = URL.valueOf("route://0.0.0.0/org.apache.dubbo.demo.DemoService?category=routers&dynamic=false&enabled=true&force=true&name=null&priority=0&router=condition&rule=+%3D%3E+host+%21%3D+172.19.7.245&runtime=false");
+        URL routeUrl = URL.valueOf("route://0.0.0.0/org.apache.dubbo.demo.DemoService?category=routers&dynamic=false&enabled=true&force=true&name=null&priority=0&router=condition&rule=+%3D%3E+host+%21%3D+192.168.15.1&runtime=false");
         registry.register(routeUrl);
     }
 

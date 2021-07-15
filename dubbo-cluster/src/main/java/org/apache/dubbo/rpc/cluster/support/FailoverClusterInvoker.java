@@ -57,6 +57,7 @@ public class FailoverClusterInvoker<T> extends AbstractClusterInvoker<T> {
         List<Invoker<T>> copyInvokers = invokers;
         checkInvokers(copyInvokers, invocation);
         String methodName = RpcUtils.getMethodName(invocation);
+        //重试次数
         int len = getUrl().getMethodParameter(methodName, RETRIES_KEY, DEFAULT_RETRIES) + 1;
         if (len <= 0) {
             len = 1;
@@ -67,17 +68,16 @@ public class FailoverClusterInvoker<T> extends AbstractClusterInvoker<T> {
         Set<String> providers = new HashSet<String>(len);
         // 循环调用，失败重试
         for (int i = 0; i < len; i++) {
-            //Reselect before retry to avoid a change of candidate `invokers`.
-            //NOTE: if `invokers` changed, then `invoked` also lose accuracy.
-            // 在进行重试前重新列举 Invoker，这样做的好处是，如果某个服务挂了，
-            // 通过调用 list 可得到最新可用的 Invoker 列表
+            // 在进行重试前重新列举 Invoker，这样做的好处是，如果某个服务挂了，通过调用 list 可得到最新可用的 Invoker 列表
             if (i > 0) {
                 checkWhetherDestroyed();
                 copyInvokers = list(invocation);
                 // check again
                 checkInvokers(copyInvokers, invocation);
             }
+            //根据负载均衡算法选择一个服务调用
             Invoker<T> invoker = select(loadbalance, invocation, copyInvokers, invoked);
+            //已经调过的服务放进invoked中
             invoked.add(invoker);
             RpcContext.getContext().setInvokers((List) invoked);
             try {

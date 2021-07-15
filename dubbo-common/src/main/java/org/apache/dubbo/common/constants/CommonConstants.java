@@ -292,7 +292,7 @@ public interface CommonConstants {
 
     String FORKS_KEY = "forks";
 
-    int DEFAULT_RETRIES = 2;
+    int DEFAULT_RETRIES = 2;//默认重试次数
 
     int DEFAULT_FAILBACK_TIMES = 3;
 

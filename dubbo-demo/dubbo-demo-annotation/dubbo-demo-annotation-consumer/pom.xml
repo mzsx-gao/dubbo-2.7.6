@@ -93,6 +93,7 @@
             <groupId>org.apache.dubbo</groupId>
             <artifactId>dubbo-metadata-report-redis</artifactId>
         </dependency>
+
     </dependencies>
 
 </project>

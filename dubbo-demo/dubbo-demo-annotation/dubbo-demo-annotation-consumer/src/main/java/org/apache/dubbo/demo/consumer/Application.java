@@ -18,19 +18,16 @@
  */
 package org.apache.dubbo.demo.consumer;
 
-import org.apache.dubbo.config.MetadataReportConfig;
-import org.apache.dubbo.config.RegistryConfig;
 import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;
 import org.apache.dubbo.demo.DemoService;
 import org.apache.dubbo.demo.consumer.comp.DemoServiceComponent;
-
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 
 public class Application {
-    /**
-     * In order to make sure multicast registry works, need to specify '-Djava.net.preferIPv4Stack=true' before
-     * launch the application
-     */
+
     public static void main(String[] args) throws Exception{
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(ConsumerConfiguration.class);
         context.start();
