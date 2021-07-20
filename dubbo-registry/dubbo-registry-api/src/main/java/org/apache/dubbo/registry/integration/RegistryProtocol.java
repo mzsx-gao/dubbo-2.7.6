@@ -485,7 +485,7 @@ public class RegistryProtocol implements Protocol {
         // 订阅 providers、configurators、routers 等节点数据
         directory.subscribe(toSubscribeUrl(subscribeUrl));
 
-        // 一个注册中心可能有多个服务提供者，因此这里需要将多个服务提供者合并为一个，生成一个invoker
+        // 一个注册中心可能有多个服务提供者，因此这里需要将多个服务提供者合并为一个，生成一个invoker，通常为MockClusterInvoker
         Invoker<T> invoker = cluster.join(directory);
         List<RegistryProtocolListener> listeners = findRegistryProtocolListeners(url);
         if (CollectionUtils.isEmpty(listeners)) {

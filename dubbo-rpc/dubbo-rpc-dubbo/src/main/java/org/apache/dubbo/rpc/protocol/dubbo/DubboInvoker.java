@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Function;
 
 import static org.apache.dubbo.common.constants.CommonConstants.DEFAULT_TIMEOUT;
 import static org.apache.dubbo.common.constants.CommonConstants.GROUP_KEY;
@@ -98,10 +99,14 @@ public class DubboInvoker<T> extends AbstractInvoker<T> {
             } else {
                 ExecutorService executor = getCallbackExecutor(getUrl(), inv);
                 // 异步调用，返回CompletableFuture类型的future，通常为DefaultFuture
-                CompletableFuture<AppResponse> appResponseFuture =
-                        currentClient.request(inv, timeout, executor).thenApply(obj -> (AppResponse) obj);
-                // save for 2.6.x compatibility, for example, TraceFilter in Zipkin uses com.alibaba.xxx.FutureAdapter
-//                FutureContext.getContext().setCompatibleFuture(appResponseFuture);
+                CompletableFuture<AppResponse> appResponseFuture = currentClient.request(inv, timeout, executor)
+                        .thenApply(new Function<Object, AppResponse>() {
+                            @Override
+                            public AppResponse apply(Object obj) {
+                                return (AppResponse) obj;
+                            }
+                        });
+//                        .thenApply(obj -> (AppResponse) obj);
                 // 包装AsyncRpcResult对象
                 AsyncRpcResult result = new AsyncRpcResult(appResponseFuture, inv);
                 result.setExecutor(executor);

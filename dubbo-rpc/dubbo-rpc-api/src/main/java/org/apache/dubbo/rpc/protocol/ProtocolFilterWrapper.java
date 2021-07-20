@@ -58,6 +58,7 @@ public class ProtocolFilterWrapper implements Protocol {
             for (int i = filters.size() - 1; i >= 0; i--) {
                 final Filter filter = filters.get(i);
                 final Invoker<T> next = last;
+                //匿名内部类
                 last = new Invoker<T>() {
                     @Override
                     public Class<T> getInterface() {
@@ -110,7 +111,9 @@ public class ProtocolFilterWrapper implements Protocol {
                                 } finally {
                                     listenableFilter.removeListener(invocation);
                                 }
-                            } else if (filter instanceof Filter.Listener) {
+                            }
+                            //结果处理
+                            else if (filter instanceof Filter.Listener) {
                                 Filter.Listener listener = (Filter.Listener) filter;
                                 if (t == null) {
                                     listener.onResponse(r, invoker, invocation);
