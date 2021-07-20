@@ -79,6 +79,15 @@ public class NettyClient extends AbstractClient {
     public NettyClient(final URL url, final ChannelHandler handler) throws RemotingException {
     	// you can customize name and type of client thread pool by THREAD_NAME_KEY and THREADPOOL_KEY in CommonConstants.
     	// the handler will be wrapped: MultiMessageHandler->HeartbeatHandler->handler
+        /**
+         *  ChannelHandler进一步包装，最终形成的ChannelHandler链:
+         *  MultiMessageHandler
+         *    HeartbeatHandler
+         *        AllChannelHandler
+         *            DecodeHandler
+         *                HeaderExchangeHandler
+         *                    dubboProtocol-requestHandler
+         */
     	super(url, wrapChannelHandler(url, handler));
     }
 
@@ -87,6 +96,7 @@ public class NettyClient extends AbstractClient {
      */
     @Override
     protected void doOpen() throws Throwable {
+        //核心ChannelHandler,内部持有NettyClient实例
         final NettyClientHandler nettyClientHandler = new NettyClientHandler(getUrl(), this);
         bootstrap = new Bootstrap();
         bootstrap.group(NIO_EVENT_LOOP_GROUP)
@@ -130,6 +140,7 @@ public class NettyClient extends AbstractClient {
     @Override
     protected void doConnect() throws Throwable {
         long start = System.currentTimeMillis();
+        //连接netty服务器
         ChannelFuture future = bootstrap.connect(getConnectAddress());
         try {
             boolean ret = future.awaitUninterruptibly(getConnectTimeout(), MILLISECONDS);

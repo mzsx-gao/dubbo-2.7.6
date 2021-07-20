@@ -422,8 +422,9 @@ public class DubboProtocol extends AbstractProtocol {
     public <T> Invoker<T> protocolBindingRefer(Class<T> serviceType, URL url) throws RpcException {
         optimizeSerialization(url);
 
-        // create rpc invoker.
-        DubboInvoker<T> invoker = new DubboInvoker<T>(serviceType, url, getClients(url), invokers);
+        // getClients(url)内部就会启动netty客户端连接服务端
+        ExchangeClient[] clients = getClients(url);
+        DubboInvoker<T> invoker = new DubboInvoker<T>(serviceType, url, clients, invokers);
         invokers.add(invoker);
 
         return invoker;
@@ -432,15 +433,14 @@ public class DubboProtocol extends AbstractProtocol {
     //这个方法里会去连接netty服务器
     private ExchangeClient[] getClients(URL url) {
         // whether to share connection
-
         boolean useShareConnect = false;
 
+        //获取connections配置参数，配置客户端跟服务端建立几个长连接
         int connections = url.getParameter(CONNECTIONS_KEY, 0);
         List<ReferenceCountExchangeClient> shareClients = null;
         // if not configured, connection is shared, otherwise, one connection for one service
         if (connections == 0) {
             useShareConnect = true;
-
             /*
              * The xml configuration should have a higher priority than properties.
              */
@@ -453,9 +453,9 @@ public class DubboProtocol extends AbstractProtocol {
 
         ExchangeClient[] clients = new ExchangeClient[connections];
         for (int i = 0; i < clients.length; i++) {
+            //如果没有配置，则建立一个长连接
             if (useShareConnect) {
                 clients[i] = shareClients.get(i);
-
             } else {
                 clients[i] = initClient(url);
             }
@@ -605,7 +605,7 @@ public class DubboProtocol extends AbstractProtocol {
                 client = new LazyConnectExchangeClient(url, requestHandler);
 
             } else {
-                //这里才是真正去连接netty服务器的地方
+                //这里才是真正去连接netty服务器的地方,requestHandler是最后调用的handler
                 client = Exchangers.connect(url, requestHandler);
             }
 

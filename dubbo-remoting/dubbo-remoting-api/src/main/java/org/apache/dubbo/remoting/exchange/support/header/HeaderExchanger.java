@@ -17,6 +17,8 @@
 package org.apache.dubbo.remoting.exchange.support.header;
 
 import org.apache.dubbo.common.URL;
+import org.apache.dubbo.remoting.ChannelHandler;
+import org.apache.dubbo.remoting.Client;
 import org.apache.dubbo.remoting.RemotingException;
 import org.apache.dubbo.remoting.Transporters;
 import org.apache.dubbo.remoting.exchange.ExchangeClient;
@@ -33,10 +35,21 @@ public class HeaderExchanger implements Exchanger {
 
     public static final String NAME = "header";
 
-    //连接服务器
+    /**
+     *  连接服务器
+     *  最终nettyClient持有的ChannelHandler链:
+     *         MultiMessageHandler
+     *                 HeartbeatHandler
+     *                     AllChannelHandler
+     *                         DecodeHandler
+     *                             HeaderExchangeHandler
+     *                                 dubboProtocol-requestHandler
+    */
     @Override
     public ExchangeClient connect(URL url, ExchangeHandler handler) throws RemotingException {
-        return new HeaderExchangeClient(Transporters.connect(url, new DecodeHandler(new HeaderExchangeHandler(handler))), true);
+        ChannelHandler channelHandler = new DecodeHandler(new HeaderExchangeHandler(handler));
+        Client client = Transporters.connect(url,channelHandler);
+        return new HeaderExchangeClient(client, true);
     }
 
     /**

@@ -41,6 +41,7 @@ public class NettyClientHandler extends ChannelDuplexHandler {
 
     private final URL url;
 
+    //持有的handler对象就是NettyClient实例，后面调用handler.received等方法时在NettyClient的父类中会转调到ChannelHandler链
     private final ChannelHandler handler;
 
     public NettyClientHandler(URL url, ChannelHandler handler) {
