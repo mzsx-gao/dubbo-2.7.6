@@ -188,7 +188,7 @@ public class AsyncRpcResult implements Result {
     public Result get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         if (executor != null && executor instanceof ThreadlessExecutor) {
             ThreadlessExecutor threadlessExecutor = (ThreadlessExecutor) executor;
-            //等待异步任务响应结果
+            //等待异步任务响应结果,这里会阻塞等待
             threadlessExecutor.waitAndDrain();
         }
         return responseFuture.get(timeout, unit);

@@ -99,14 +99,8 @@ public class DubboInvoker<T> extends AbstractInvoker<T> {
             } else {
                 ExecutorService executor = getCallbackExecutor(getUrl(), inv);
                 // 异步调用，返回CompletableFuture类型的future，通常为DefaultFuture
-                CompletableFuture<AppResponse> appResponseFuture = currentClient.request(inv, timeout, executor)
-                        .thenApply(new Function<Object, AppResponse>() {
-                            @Override
-                            public AppResponse apply(Object obj) {
-                                return (AppResponse) obj;
-                            }
-                        });
-//                        .thenApply(obj -> (AppResponse) obj);
+                CompletableFuture<AppResponse> appResponseFuture =
+                    currentClient.request(inv, timeout, executor).thenApply(obj -> (AppResponse) obj);
                 // 包装AsyncRpcResult对象
                 AsyncRpcResult result = new AsyncRpcResult(appResponseFuture, inv);
                 result.setExecutor(executor);

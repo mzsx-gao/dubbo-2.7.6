@@ -81,7 +81,8 @@ public class DefaultFuture extends CompletableFuture<Object> {
         this.request = request;
         this.id = request.getId();
         this.timeout = timeout > 0 ? timeout : channel.getUrl().getPositiveParameter(TIMEOUT_KEY, DEFAULT_TIMEOUT);
-        // put into waiting map.
+
+        //维护调用编号->DefaultFuture对象的调用关系
         FUTURES.put(id, this);
         CHANNELS.put(id, channel);
     }
@@ -111,7 +112,7 @@ public class DefaultFuture extends CompletableFuture<Object> {
         if (executor instanceof ThreadlessExecutor) {
             ((ThreadlessExecutor) executor).setWaitingFuture(future);
         }
-        // timeout check
+        // 开启超时检查
         timeoutCheck(future);
         return future;
     }
@@ -287,13 +288,17 @@ public class DefaultFuture extends CompletableFuture<Object> {
             this.requestID = requestID;
         }
 
+        /**
+         * 如果一个 future 正常完成之后，会从 FUTURES 里面移除掉。
+         * 那么如果到点了，根据编号没有取到 Future 或者取到的这个 Future 的状态是 done 了，则说明这个请求没有超时
+         */
         @Override
         public void run(Timeout timeout) {
             DefaultFuture future = DefaultFuture.getFuture(requestID);
             if (future == null || future.isDone()) {
                 return;
             }
-
+            //超时
             if (future.getExecutor() != null) {
                 future.getExecutor().execute(() -> notifyTimeout(future));
             } else {

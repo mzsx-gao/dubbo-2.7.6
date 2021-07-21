@@ -85,7 +85,7 @@ public class ThreadlessExecutor extends AbstractExecutorService {
         if (finished) {
             return;
         }
-
+        //如果当前没有数据，此处会阻塞,queue的值在下面execute方法里设置,而execute方法是AllChannelHandler调的
         Runnable runnable = queue.take();
 
         synchronized (lock) {

@@ -41,7 +41,7 @@ public class NettyClientHandler extends ChannelDuplexHandler {
 
     private final URL url;
 
-    //持有的handler对象就是NettyClient实例，后面调用handler.received等方法时在NettyClient的父类中会转调到ChannelHandler链
+    //持有的handler对象就是NettyClient实例，后面调用channelRead等方法时在NettyClient的父类中会转调到ChannelHandler链
     private final ChannelHandler handler;
 
     public NettyClientHandler(URL url, ChannelHandler handler) {
@@ -87,6 +87,7 @@ public class NettyClientHandler extends ChannelDuplexHandler {
 
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+        logger.info("客户端写入消息:"+msg.toString());
         super.write(ctx, msg, promise);
         final NettyChannel channel = NettyChannel.getOrAddChannel(ctx.channel(), url, handler);
         final boolean isRequest = msg instanceof Request;
