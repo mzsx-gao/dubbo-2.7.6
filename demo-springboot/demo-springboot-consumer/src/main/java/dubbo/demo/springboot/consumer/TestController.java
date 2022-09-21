@@ -1,8 +1,8 @@
-package org.apache.dubbo.demo.consumer.comp;
+package dubbo.demo.springboot.consumer;
 
+import dubbo.demo.springboot.DemoService;
 import org.apache.dubbo.config.annotation.Reference;
-import org.apache.dubbo.demo.DemoService;
-import org.springframework.stereotype.Controller;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -11,16 +11,16 @@ import org.springframework.web.bind.annotation.RestController;
  * 描述: 测试
  *
  * @author gaoshudian
- * @date 2021/7/15 20:09
+ * @date 4/26/22 11:33 PM
  */
 @RestController
 public class TestController {
 
-    @Reference
+    @Reference(version = "1.0.0",group = "dubbo")
     private DemoService demoService;
 
     @RequestMapping("/test")
-    public String test(String name){
-        return demoService.sayHello(name);
+    public String test(){
+        return demoService.sayHello("hello world");
     }
 }

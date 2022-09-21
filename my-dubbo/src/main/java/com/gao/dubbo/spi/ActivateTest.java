@@ -8,12 +8,12 @@ import org.junit.Test;
 import java.util.List;
 
 /**
- * 某此情况下，同一个接口的多个实现需要同时发挥作用，比如filter链。此时需要按条件选择一批实现类来工作
- * Activate：可以被框架中自动激活加载扩展
- * 用户通过group和value配置激活条件
- * group 分组(筛选条件)
- * value url中包含的key名(筛选条件)
- * order 排序
+ * 某些情况下，同一个接口的多个实现需要同时发挥作用，比如filter链，此时需要按条件选择一批实现类来工作
+ * Activate：可以被框架中自动激活加载扩展，用户通过group和value配置激活条件
+ * @Activate 注解参数：
+ *      group 分组(筛选条件)
+ *      value url中包含的key名(筛选条件)
+ *      order 排序
  *
  * 下面以filter过滤器为例讲解
  * 1.如果需要在服务暴露时装载，那么group="provider"
@@ -31,9 +31,9 @@ public class ActivateTest {
         ExtensionLoader<Filter> extensionLoader = ExtensionLoader.getExtensionLoader(Filter.class);
 
         URL url = URL.valueOf("dubbo://192.168.0.101:20880/XxxService");
-        List<Filter> list=extensionLoader.getActivateExtension(url,"", "peter");//group
-        for (Filter filter:list){
-            filter.invoke(null,null);
+        List<Filter> list = extensionLoader.getActivateExtension(url, "", "peter");//group
+        for (Filter filter : list) {
+            filter.invoke(null, null);
         }
     }
 
@@ -47,9 +47,9 @@ public class ActivateTest {
 
         URL url = URL.valueOf("dubbo://192.168.0.101:20880/XxxService");
         url = url.addParameter("test", "66666");
-        List<Filter> list = extensionLoader.getActivateExtension(url,"","james");
-        for (Filter filter:list){
-            filter.invoke(null,null);
+        List<Filter> list = extensionLoader.getActivateExtension(url, "", "james");
+        for (Filter filter : list) {
+            filter.invoke(null, null);
         }
     }
 
@@ -66,9 +66,9 @@ public class ActivateTest {
         url = url.addParameter("groupId", "qqqq");
         url = url.addParameter("myfilter", "a,-c");
 
-        List<Filter> list = extensionLoader.getActivateExtension(url,"myfilter","peter");
-        for (Filter filter:list){
-            filter.invoke(null,null);
+        List<Filter> list = extensionLoader.getActivateExtension(url, "myfilter", "peter");
+        for (Filter filter : list) {
+            filter.invoke(null, null);
         }
     }
 }

@@ -26,16 +26,26 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
+import java.util.Random;
+
 public class Application {
 
-    public static void main(String[] args) throws Exception{
-        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(ConsumerConfiguration.class);
+    public static void main(String[] args) throws Exception {
+        AnnotationConfigApplicationContext context =
+            new AnnotationConfigApplicationContext(ConsumerConfiguration.class);
         context.start();
         System.out.println("客户端启动成功");
-        DemoService service = context.getBean("demoServiceComponent", DemoServiceComponent.class);
-        String hello = service.sayHello("world");
-        System.out.println("返回结果result :" + hello);
-        System.in.read();
+        while (true) {
+            String req = String.valueOf(new Random().nextInt(2));
+            DemoService service = context.getBean("demoServiceComponent", DemoServiceComponent.class);
+            try{
+                String response = service.sayHello(req);
+                System.out.println("返回结果 :" + response);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            Thread.sleep(1000 * 60);
+        }
     }
 
     @Configuration

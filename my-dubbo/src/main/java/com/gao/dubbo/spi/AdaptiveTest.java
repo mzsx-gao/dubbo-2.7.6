@@ -31,7 +31,7 @@ public class AdaptiveTest {
     }
 
     /**
-     * 各个实现类上面没有@Adaptive,接口某个方法上有@Adaptive ,PI上有注解@SPI("b")
+     * 各个实现类上面没有@Adaptive,接口某个方法上有@Adaptive ,SPI上有注解@SPI("b")
      * 1.URL中有具体的值info.service=a,则以URL为准，选择A实现
      * 2.接口方法中注解@Adaptive({"InfoService"}),URL中有具体的值InfoService=c,则以URL中的InfoService参数为准，选择C实现
      * 3.url无参数,则以@SPI("b")为准，选择b实现
@@ -51,6 +51,9 @@ public class AdaptiveTest {
         System.out.println(adaptiveExtension.passInfo("james", url));
     }
 
+    /**
+     * 测试dubbo的依赖注入
+     */
     @Test
     public void iocSPI() {
         //获取OrderService的 Loader 实例

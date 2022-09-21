@@ -370,7 +370,21 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
             }
             // 如果只有一个注册中心，则直接调用refer方法
             if (urls.size() == 1) {
-                // 调用 RegistryProtocol 的 refer 构建 Invoker 实例
+                /**
+                 * 调用 RegistryProtocol 的 refer 构建 Invoker 实例
+                 * 生成的Invoker链如下:
+                 * MockClusterInvoker
+                 * AbstractCluster$InterceptorInvokerNode
+                 * FailoverClusterInvoker-内部持有RegistryDirectory
+                 *
+                 * RegistryDirectory$invokers
+                 *
+                 * RegistryDirectory$InvokerDelegate
+                 * ListenerInvokerWrapper
+                 * ...3个过滤器
+                 * AsyncToSyncInvoker
+                 * DubboInvoker - 调用其invoker方法就会给netty服务端发送请求
+                 */
                 invoker = REF_PROTOCOL.refer(interfaceClass, urls.get(0));
             }
             else {

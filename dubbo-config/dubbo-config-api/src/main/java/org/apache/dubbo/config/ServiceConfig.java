@@ -222,6 +222,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
      */
     private void checkAndUpdateSubConfigs() {
         // Use default configs defined explicitly with global scope
+        // 补全ServiceConfig的属性
         completeCompoundConfigs();
         checkDefault();
         //内部会设置serviceConfig的protocols属性(协议)
@@ -236,6 +237,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
             //设置serviceConfig的registries（注册中心）
             checkRegistry();
         }
+        //刷新ServiceConfig配置
         this.refresh();
 
         if (StringUtils.isEmpty(interfaceName)) {
@@ -564,7 +566,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
             if (url.getParameter(REGISTER_KEY, true)) {
                 logger.info("注册dubbo服务: " + interfaceClass.getName() + " url " + url + " to registry " + registryURL);
             } else {
-                logger.info("Export dubbo service " + interfaceClass.getName() + " to url " + url);
+                logger.info("导出dubbo服务: " + interfaceClass.getName() + " to url " + url);
             }
         }
 
@@ -573,10 +575,10 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         if (StringUtils.isNotEmpty(proxy)) {
             registryURL = registryURL.addParameter(PROXY_KEY, proxy);
         }
-        // 为服务提供类(ref)生成 Invoker,此处获取到的Invoker是最终调用目标类的代理类，是一个动态生成的一个包装类，
         registryURL = registryURL.addParameterAndEncoded(EXPORT_KEY, url.toFullString());
-        Invoker<?> invoker = PROXY_FACTORY.getInvoker(ref, (Class) interfaceClass,registryURL);
 
+        // 为服务提供类(ref)生成 Invoker,此处获取到的Invoker是最终调用目标类的代理类，是一个动态生成的一个包装类，
+        Invoker<?> invoker = PROXY_FACTORY.getInvoker(ref, (Class) interfaceClass,registryURL);
         DelegateProviderMetaDataInvoker wrapperInvoker = new DelegateProviderMetaDataInvoker(invoker, this);
         // 暴露服务到远程，并生成 Exporter
         // 这里大致可以分为服务暴露和服务注册两个过程,这里会调用RegistryProtocol的 export()方法

@@ -47,7 +47,8 @@ public class ChannelHandlers {
 
     //对ChannelHandler进行包装，Dispatcher是AllDispatcher
     protected ChannelHandler wrapInternal(ChannelHandler handler, URL url) {
-        return new MultiMessageHandler(new HeartbeatHandler(
-                ExtensionLoader.getExtensionLoader(Dispatcher.class).getAdaptiveExtension().dispatch(handler, url)));
+        Dispatcher dispatcher = ExtensionLoader.getExtensionLoader(Dispatcher.class).getAdaptiveExtension();
+        ChannelHandler dispatcherChannelhandler = dispatcher.dispatch(handler, url);
+        return new MultiMessageHandler(new HeartbeatHandler(dispatcherChannelhandler));
     }
 }

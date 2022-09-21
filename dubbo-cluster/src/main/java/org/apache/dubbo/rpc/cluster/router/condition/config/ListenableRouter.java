@@ -58,8 +58,7 @@ public abstract class ListenableRouter extends AbstractRouter implements Configu
     @Override
     public synchronized void process(ConfigChangedEvent event) {
         if (logger.isInfoEnabled()) {
-            logger.info("Notification of condition rule, change type is: " + event.getChangeType() +
-                    ", raw rule is:\n " + event.getContent());
+            logger.info("条件规则修改通知, change type is: " + event.getChangeType() + ", raw rule is:\n " + event.getContent());
         }
 
         if (event.getChangeType().equals(ConfigChangeType.DELETED)) {

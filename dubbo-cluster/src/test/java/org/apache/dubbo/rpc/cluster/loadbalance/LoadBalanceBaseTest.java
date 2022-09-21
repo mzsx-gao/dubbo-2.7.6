@@ -118,7 +118,7 @@ public class LoadBalanceBaseTest {
     }
 
     public Map<Invoker, AtomicLong> getInvokeCounter(int runs, String loadbalanceName) {
-        Map<Invoker, AtomicLong> counter = new ConcurrentHashMap<Invoker, AtomicLong>();
+        Map<Invoker, AtomicLong> counter = new ConcurrentHashMap<>();
         LoadBalance lb = getLoadBalance(loadbalanceName);
         for (Invoker invoker : invokers) {
             counter.put(invoker, new AtomicLong(0));

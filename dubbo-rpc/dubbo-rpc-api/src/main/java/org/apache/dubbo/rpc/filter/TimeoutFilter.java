@@ -50,6 +50,7 @@ public class TimeoutFilter implements Filter, Filter.Listener {
         Object startTime = invocation.get(TIMEOUT_FILTER_START_TIME);
         if (startTime != null) {
             long elapsed = System.currentTimeMillis() - (Long) startTime;
+            //如果服务端处理超时，则记录超时日志
             if (invoker.getUrl() != null && elapsed > invoker.getUrl().getMethodParameter(invocation.getMethodName(), "timeout", Integer.MAX_VALUE)) {
                 if (logger.isWarnEnabled()) {
                     logger.warn("invoke time out. method: " + invocation.getMethodName() + " arguments: " + Arrays.toString(invocation.getArguments()) + " , url is " + invoker.getUrl() + ", invoke elapsed " + elapsed + " ms.");

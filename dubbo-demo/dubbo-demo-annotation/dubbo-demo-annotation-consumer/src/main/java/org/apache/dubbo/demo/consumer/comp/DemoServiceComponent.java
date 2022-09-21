@@ -33,7 +33,7 @@ public class DemoServiceComponent implements DemoService {
 //    @Reference(mock = "org.apache.dubbo.demo.DemoServiceMock")
 //    @Reference(mock = "return {\"hello\":\"world\"}")
 //    @Reference(mock = "force:return mock降级")
-    @Reference
+    @Reference(version = "1.0.0",group = "dubbo")
     private DemoService demoService;
 
     @Override

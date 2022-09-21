@@ -137,13 +137,22 @@ public class ReferenceAnnotationBeanPostProcessor extends AbstractAnnotationBean
         // 是否是本地的service
         boolean localServiceBean = isLocalServiceBean(referencedBeanName, referenceBean, attributes);
 
-        // 注册ReferenceBean到spring容器中,bean的名字例如: "@Reference org.apache.dubbo.demo.DemoService"
+        /**
+         * 注册ReferenceBean到spring容器中,bean的名字例如: "@Reference org.apache.dubbo.demo.DemoService"
+         * 注意这里是直接注册单例(对象已经创建出来了)，而不是注册beanDefinition
+         * 注册这个bean的目的是在项目里其它地方可以直接@Autowired这个创建的ReferenceBean,如:
+         *  @Reference
+         *  private DemoService demoService;
+         *  @Autowired
+         *  private DemoService demoService;
+         */
         registerReferenceBean(referencedBeanName, referenceBean, attributes, localServiceBean, injectedType);
 
         // 缓存ReferenceBean
         cacheInjectedReferenceBean(referenceBean, injectedElement);
 
         // 创建指定类型的Dubbo服务接口的ReferenceBean的代理
+        // service中注入的就是这个代理对象，内部会调用referenceBean.get()方法
         return getOrCreateProxy(referencedBeanName, referenceBean, localServiceBean, injectedType);
     }
 

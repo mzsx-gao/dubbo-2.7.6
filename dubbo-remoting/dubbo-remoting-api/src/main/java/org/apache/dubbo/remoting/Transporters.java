@@ -59,8 +59,7 @@ public class Transporters {
             handler = new ChannelHandlerDispatcher(handlers);
         }
         /*
-         * 获取自适应 Transporter 实例，并调用实例方法
-         * 这里寻找自适应Transporter实例的核心代码:
+         * 获取自适应 Transporter 实例，并调用实例方法这里寻找自适应Transporter实例的核心代码:
          * String extName = url.getParameter("server", url.getParameter("transporter", "netty"))
           */
         return getTransporter().bind(url, handler);

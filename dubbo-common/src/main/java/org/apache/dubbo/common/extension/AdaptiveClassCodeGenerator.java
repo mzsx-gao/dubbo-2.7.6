@@ -106,7 +106,7 @@ public class AdaptiveClassCodeGenerator {
         code.append("}");
 
         if (logger.isDebugEnabled()) {
-            logger.debug("这里生成的代理类代码是:\n"+code.toString());
+            logger.info("这里生成的adaptive拓展类代码是:\n"+code.toString());
         }
         return code.toString();
     }

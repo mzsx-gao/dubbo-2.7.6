@@ -2,6 +2,7 @@ package org.apache.dubbo.rpc.cluster;
 
 import org.apache.dubbo.common.extension.ExtensionLoader;
 
+//Cluster类的自适应拓展类
 public class Cluster$Adaptive implements Cluster {
 
     public org.apache.dubbo.rpc.Invoker join(Directory arg0) throws org.apache.dubbo.rpc.RpcException {

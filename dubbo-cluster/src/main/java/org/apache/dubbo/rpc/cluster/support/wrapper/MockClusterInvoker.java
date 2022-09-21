@@ -90,12 +90,15 @@ public class MockClusterInvoker<T> implements Invoker<T> {
             //force:direct mock
             result = doMockInvoke(invocation, null);
         }
-        // 失败服务降级
+        /**
+         *  失败服务降级
+         *  注意：只有报RpcException才会走降级逻辑，而如果会服务端服务接口业务本身报的错，不会走降级逻辑，而会往上抛
+         */
         else {
             try {
                 // 正常调用
                 result = this.invoker.invoke(invocation);
-                //fix:#4585
+
                 if(result.getException() != null && result.getException() instanceof RpcException){
                     RpcException rpcException= (RpcException)result.getException();
                     if(rpcException.isBiz()){
@@ -104,7 +107,6 @@ public class MockClusterInvoker<T> implements Invoker<T> {
                         result = doMockInvoke(invocation, rpcException);
                     }
                 }
-
             } catch (RpcException e) {
                 if (e.isBiz()) {
                     throw e;
@@ -112,7 +114,7 @@ public class MockClusterInvoker<T> implements Invoker<T> {
                 if (logger.isWarnEnabled()) {
                     logger.warn("调用失败，服务降级: " + invocation.getMethodName() + " fail-mock enabled , url : " + getUrl(), e);
                 }
-                // 如果调用失败，则服务降级
+                // 如果调用失败，报RpcException，则服务降级
                 result = doMockInvoke(invocation, e);
             }
         }

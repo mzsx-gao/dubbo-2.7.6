@@ -18,9 +18,7 @@ package org.apache.dubbo.rpc.proxy;
 
 import org.apache.dubbo.common.logger.Logger;
 import org.apache.dubbo.common.logger.LoggerFactory;
-import org.apache.dubbo.rpc.Constants;
-import org.apache.dubbo.rpc.Invoker;
-import org.apache.dubbo.rpc.RpcInvocation;
+import org.apache.dubbo.rpc.*;
 import org.apache.dubbo.rpc.model.ApplicationModel;
 import org.apache.dubbo.rpc.model.ConsumerModel;
 
@@ -72,7 +70,22 @@ public class InvokerInvocationHandler implements InvocationHandler {
             rpcInvocation.put(Constants.CONSUMER_MODEL, consumerModel);
             rpcInvocation.put(Constants.METHOD_MODEL, consumerModel.getMethodModel(method));
         }
-        // 调用invoke
-        return invoker.invoke(rpcInvocation).recreate();
+        /**
+         * 执行invoke调用：
+         * MockClusterInvoker
+         * AbstractCluster$InterceptorInvokerNode
+         * FailoverClusterInvoker-内部持有RegistryDirectory
+         * RegistryDirectory$InvokerDelegate
+         * ListenerInvokerWrapper
+         * ...3个过滤器
+         * AsyncToSyncInvoker
+         * DubboInvoker - 调用其invoker方法就会给netty服务端发送请求
+         */
+        AsyncRpcResult asyncRpcResult = (AsyncRpcResult)invoker.invoke(rpcInvocation);
+        /**
+         * 这里的recreate方法很重要，他会调用AppResponse的recreate方法，
+         * 如果AppResponse对象中存在exception信息，则此方法中会throw这个异常
+         */
+        return asyncRpcResult.recreate();
     }
 }

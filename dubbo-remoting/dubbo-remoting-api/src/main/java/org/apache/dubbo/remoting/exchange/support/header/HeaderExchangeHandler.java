@@ -165,6 +165,7 @@ public class HeaderExchangeHandler implements ChannelHandlerDelegate {
         }
     }
 
+    //请求和响应都会走到这里
     @Override
     public void received(Channel channel, Object message) throws RemotingException {
         final ExchangeChannel exchangeChannel = HeaderExchangeChannel.getOrAddChannel(channel);
@@ -178,6 +179,7 @@ public class HeaderExchangeHandler implements ChannelHandlerDelegate {
                 if (request.isTwoWay()) {
                     handleRequest(exchangeChannel, request);
                 } else {
+                    //会调到dubboProtocol$requestHandler
                     handler.received(exchangeChannel, request.getData());
                 }
             }

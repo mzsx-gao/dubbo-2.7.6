@@ -56,7 +56,7 @@ public class JavassistProxyFactory extends AbstractProxyFactory {
     // 创建Invoker
     @Override
     public <T> Invoker<T> getInvoker(T proxy, Class<T> type, URL url) {
-        // 为目标类创建 Wrapper
+        // 为目标类创建 Wrapper,Wrapper是针对某个类或某个接口的包装类，通过wrapper对象可以更方便的去执行某个类或某个接口的方法
         final Wrapper wrapper = Wrapper.getWrapper(proxy.getClass().getName().indexOf('$') < 0 ? proxy.getClass() : type);
         // 创建匿名 Invoker 类对象，并实现 doInvoke 方法。
         return new AbstractProxyInvoker<T>(proxy, type, url) {

@@ -36,7 +36,7 @@ public class HeaderExchanger implements Exchanger {
     public static final String NAME = "header";
 
     /**
-     *  连接服务器
+     *  连接服务器:
      *  最终nettyClient持有的ChannelHandler链:
      *         MultiMessageHandler
      *                 HeartbeatHandler
@@ -53,10 +53,13 @@ public class HeaderExchanger implements Exchanger {
     }
 
     /**
-     * 创建 HeaderExchangeServer 实例，该方法包含了多个逻辑，分别如下：
-     * 1. new HeaderExchangeHandler(handler)
-     * 2. new DecodeHandler(new HeaderExchangeHandler(handler))
-     * 3. Transporters.bind(url, new DecodeHandler(new HeaderExchangeHandler(handler)))
+     * 启动服务器:
+     * MultiMessageHandler
+     *     HeartbeatHandler
+     *         AllChannelHandler
+     *             DecodeHandler
+     *                 HeaderExchangeHandler
+     *                     dubboProtocol-requestHandler
      */
     @Override
     public ExchangeServer bind(URL url, ExchangeHandler handler) throws RemotingException {

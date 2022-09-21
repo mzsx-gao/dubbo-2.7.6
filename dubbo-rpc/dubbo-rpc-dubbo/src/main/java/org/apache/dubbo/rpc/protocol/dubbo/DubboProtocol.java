@@ -119,7 +119,8 @@ public class DubboProtocol extends AbstractProtocol {
 
             Invocation inv = (Invocation) message;
             logger.info("服务端收到客户端传递过来的Invocation信息:"+ inv.toString());
-            // 获取invoker,从exporterMap中获取
+            // 获取invoker,从exporterMap中获取,就是服务实现者，
+            // 这里获取的invoker是会被ProtocolFilterWrapper（构造一个Filter链）和ProtocolListenerWrapper包装
             Invoker<?> invoker = getInvoker(channel, inv);
             // need to consider backward-compatibility if it's a callback
             if (Boolean.TRUE.toString().equals(inv.getObjectAttachments().get(IS_CALLBACK_SERVICE_INVOKE))) {
@@ -145,6 +146,7 @@ public class DubboProtocol extends AbstractProtocol {
                 }
             }
             RpcContext.getContext().setRemoteAddress(channel.getRemoteAddress());
+            //会经过一系列Filter链，然后再调用服务实现者
             Result result = invoker.invoke(inv);
             return result.thenApply(Function.identity());
         }

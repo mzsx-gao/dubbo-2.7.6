@@ -30,6 +30,7 @@ public class Z_MyTest {
         System.out.println(protocol);
     }
 
+
     @Test
     public void getProxyFactory() {
         ProxyFactory proxyFactory = ExtensionLoader.getExtensionLoader(ProxyFactory.class).getAdaptiveExtension();
@@ -55,6 +56,7 @@ public class Z_MyTest {
         registry.register(URL.valueOf("override://0.0.0.0/org.apache.dubbo.demo.DemoService?category=configurators&compatible_config=true&dynamic=false&enabled=true&timeout=6600"));
     }
 
+    //注册服务到注册中心
     @Test
     public void registryRoutes() {
         RegistryFactory registryFactory = ExtensionLoader.getExtensionLoader(RegistryFactory.class).getAdaptiveExtension();
@@ -63,6 +65,7 @@ public class Z_MyTest {
         registry.register(routeUrl);
     }
 
+    //获取路由规则
     @Test
     public void getRoutes() {
         URL url = URL.valueOf("consumer://172.19.7.245/org.apache.dubbo.demo.DemoService?" +

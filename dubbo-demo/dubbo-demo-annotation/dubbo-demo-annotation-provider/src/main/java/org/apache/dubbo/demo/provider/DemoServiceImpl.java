@@ -27,16 +27,16 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CompletableFuture;
 
-@Service(timeout = 6000)
+@Service(timeout = 6000,version = "1.0.0",group = "dubbo")
 public class DemoServiceImpl implements DemoService {
     private static final Logger logger = LoggerFactory.getLogger(DemoServiceImpl.class);
 
     @Override
     public String sayHello(String name) {
-//        if(1==1){
-//            System.out.println(1/0);
-//        }
-        logger.info("Hello " + name + ", request from consumer: " + RpcContext.getContext().getRemoteAddress());
+        if("0".equals(name)){
+            System.out.println(1/0);
+        }
+        logger.info("来自客户端: " + RpcContext.getContext().getRemoteAddress() +"请求数据: "+name);
         return "Hello " + name + ", response from provider: " + RpcContext.getContext().getLocalAddress();
     }
 

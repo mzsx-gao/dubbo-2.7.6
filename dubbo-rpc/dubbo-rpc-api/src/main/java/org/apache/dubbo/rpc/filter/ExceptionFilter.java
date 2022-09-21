@@ -49,9 +49,11 @@ public class ExceptionFilter implements Filter, Filter.Listener {
 
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
+        logger.info("走了exceptionFilter过滤器。。。");
         return invoker.invoke(invocation);
     }
 
+    //异常处理
     @Override
     public void onResponse(Result appResponse, Invoker<?> invoker, Invocation invocation) {
         if (appResponse.hasException() && GenericService.class != invoker.getInterface()) {

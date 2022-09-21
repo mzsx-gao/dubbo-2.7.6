@@ -209,21 +209,36 @@ public class RegistryProtocol implements Protocol {
          */
         URL providerUrl = getProviderUrl(originInvoker);
 
-        // 获取override订阅 URL
+        // overrideSubscribeUrl是老版本的动态配置监听url，表示了需要监听的服务以及监听的类型（configurators， 这是老版本上的动态配置）
+        // 在服务提供者url的基础上，生成一个overrideSubscribeUrl，协议为provider://，增加参数category=configurators&check=false
         final URL overrideSubscribeUrl = getSubscribedOverrideUrl(providerUrl);
-        // 创建override的监听器
+        // 一个overrideSubscribeUrl对应一个OverrideListener，用来监听变化事件，监听到overrideSubscribeUrl的变化后，
+        // OverrideListener就会根据变化进行相应处理，具体处理逻辑看OverrideListener的实现
         final OverrideListener overrideSubscribeListener = new OverrideListener(overrideSubscribeUrl, originInvoker);
         // 把监听器添加到集合
         overrideListeners.put(overrideSubscribeUrl, overrideSubscribeListener);
 
-        // 根据override的配置来覆盖原来的url，使得配置是最新的
+        /**
+         * 在这个方法里会利用providerConfigurationListener和serviceConfigurationListener去重写providerUrl
+         * providerConfigurationListener表示应用级别的动态配置监听器，providerConfigurationListener是RegistyProtocol的一个属性
+         * serviceConfigurationListener表示服务级别的动态配置监听器，serviceConfigurationListener是在每暴露一个服务时就会生成一个
+         * 这两个监听器都是新版本中的监听器
+         * 新版本监听的zk路径是：
+         * 服务： /dubbo/config/dubbo/org.apache.dubbo.demo.DemoService.configurators节点的内容
+         * 应用： /dubbo/config/dubbo/dubbo-demo-provider-application.configurators节点的内容
+         *
+         * 注意，要喝配置中心的路径区分开来，配置中心的路径是：
+         * 应用：/dubbo/config/dubbo/org.apache.dubbo.demo.DemoService/dubbo.properties节点的内容
+         * 全局：/dubbo/config/dubbo/dubbo.properties节点的内容
+         */
         providerUrl = overrideUrlWithConfig(providerUrl, overrideSubscribeListener);
+
         //1.暴露服务，其实就是启动netty服务端
         final ExporterChangeableWrapper<T> exporter = doLocalExport(originInvoker, providerUrl);
 
         // 根据 URL 加载 Registry 实现类，比如ZookeeperRegistry
         final Registry registry = getRegistry(originInvoker);
-        // 获取将要注册到zookeeper下providers节点下的url
+        // 获取将要注册到zookeeper下providers节点下的url，这里会对服务提供者url中的参数进行简化
         // 例如:dubbo://192.168.15.1:20888/org.apache.dubbo.demo.DemoService?application=dubbo-demo-annotation-provider
         // &deprecated=false&dubbo=2.0.2&timeout=6000&timestamp=1626102051421
         final URL registeredProviderUrl = getUrlToRegistry(providerUrl, registryUrl);
@@ -234,7 +249,15 @@ public class RegistryProtocol implements Protocol {
             register(registryUrl, registeredProviderUrl);
         }
 
-        // 向注册中心进行订阅 override 数据
+        /**
+         * 针对老版本的动态配置，需要把overrideSubscribeListener绑定到overrideSubscribeUrl上去进行监听
+         * 兼容老版本的配置修改，利用overrideSubscribeListener去监听旧版本的动态配置变化
+         *
+         * 那么新版本的providerConfigurationListener和serviceConfigurationListener是在什么时候进行订阅的呢？在这两个类构造的时候
+         * 老版本监听的zk路径是：/dubbo/org.apache.dubbo.demo.DemoService/configurators/override://0.0.0.0/org.apache.dubbo
+         * .demo.DemoService?category=configurators&compatible_config=true&dynamic=false&enabled=true&timeout=6000
+         * 监听的是路径的内容，不是节点的内容
+         */
         registry.subscribe(overrideSubscribeUrl, overrideSubscribeListener);
 
         // 设置注册中心url
@@ -259,9 +282,13 @@ public class RegistryProtocol implements Protocol {
     }
 
     private URL overrideUrlWithConfig(URL providerUrl, OverrideListener listener) {
+        // 应用配置，providerConfigurationListener是在属性那里直接初始化好的，providerConfigurationListener会监听配置中心的应用配置信息变动
         providerUrl = providerConfigurationListener.overrideUrl(providerUrl);
+
+        // 服务配置，new ServiceConfigurationListener的时候会初始化，ServiceConfigurationListener会监听配置中心的服务信息配置信息变动
         ServiceConfigurationListener serviceConfigurationListener = new ServiceConfigurationListener(providerUrl, listener);
         serviceConfigurationListeners.put(providerUrl.getServiceKey(), serviceConfigurationListener);
+
         return serviceConfigurationListener.overrideUrl(providerUrl);
     }
 
@@ -471,7 +498,6 @@ public class RegistryProtocol implements Protocol {
         URL subscribeUrl = new URL(CONSUMER_PROTOCOL, parameters.remove(REGISTER_IP_KEY), 0, type.getName(), parameters);
         if (directory.isShouldRegister()) {
             directory.setRegisteredConsumerUrl(subscribeUrl);
-            //
             /**
              * 注册服务消费者，注册到consumers目录下：
              * consumer://172.19.7.245/org.apache.dubbo.demo.DemoService?application=dubbo-demo-annotation-consumer
@@ -480,9 +506,19 @@ public class RegistryProtocol implements Protocol {
              */
             registry.register(directory.getRegisteredConsumerUrl());
         }
-        // 创建路由规则链
+        /**
+         * 构造路由链,路由链会在引入服务时按路由条件进行过滤
+         * 路由链是动态服务目录中的一个属性，通过路由链可以过滤某些服务提供者
+         */
         directory.buildRouterChain(subscribeUrl);
-        // 订阅 providers、configurators、routers 等节点数据
+        /**
+         * 服务目录需要订阅的几个路径
+         * 当前应用所对应的动态配置目录：/dubbo/config/dubbo/dubbo-demo-consumer-application.configurators
+         * 当前所引入的服务的动态配置目录：/dubbo/config/dubbo/org.apache.dubbo.demo.DemoService:1.1.1:g1.configurators
+         * 当前所引入的服务的提供者目录：/dubbo/org.apache.dubbo.demo.DemoService/providers
+         * 当前所引入的服务的老版本动态配置目录：/dubbo/org.apache.dubbo.demo.DemoService/configurators
+         * 当前所引入的服务的老版本路由器目录：/dubbo/org.apache.dubbo.demo.DemoService/routers
+         */
         directory.subscribe(toSubscribeUrl(subscribeUrl));
 
         // 一个注册中心可能有多个服务提供者，因此这里需要将多个服务提供者合并为一个，生成一个invoker，通常为MockClusterInvoker
@@ -672,6 +708,7 @@ public class RegistryProtocol implements Protocol {
             URL currentUrl = exporter.getInvoker().getUrl();
             //用override配置覆盖currentUrl
             URL newUrl = getConfigedInvokerUrl(configurators, currentUrl);
+
             newUrl = getConfigedInvokerUrl(providerConfigurationListener.getConfigurators(), newUrl);
             newUrl = getConfigedInvokerUrl(serviceConfigurationListeners.get(originUrl.getServiceKey()).getConfigurators(), newUrl);
             if (!currentUrl.equals(newUrl)) {

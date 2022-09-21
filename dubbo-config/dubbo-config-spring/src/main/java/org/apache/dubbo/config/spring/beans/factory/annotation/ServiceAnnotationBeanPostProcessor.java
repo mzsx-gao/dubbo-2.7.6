@@ -254,6 +254,7 @@ public class ServiceAnnotationBeanPostProcessor implements BeanDefinitionRegistr
 
     /**
      * Registers {@link ServiceBean} from new annotated {@link Service} {@link BeanDefinition}
+     * 注册ServiceBean,这个ServiceBean是dubbo用来对外发布的
      *
      * @param beanDefinitionHolder
      * @param registry

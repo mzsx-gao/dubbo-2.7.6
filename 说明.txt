@@ -1,0 +1,3 @@
+demo-springboot是dubbo集成springboot的示例
+my-dubbo是dubbo的一些java级别的工具类
+dubbo-demo是dubbo源码自带的官方示例

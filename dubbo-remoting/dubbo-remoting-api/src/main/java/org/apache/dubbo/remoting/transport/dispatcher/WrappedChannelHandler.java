@@ -34,7 +34,7 @@ import java.util.concurrent.ExecutorService;
 /**
  * 该类跟AbstractChannelHandlerDelegate的作用类似，都是装饰模式中的装饰角色，其中的所有实现方法都直接调用
  * 被装饰的handler属性的方法，该类是为了添加线程池的功能，它的子类都是去关心哪些消息是需要分发到线程池的，
- * 哪些消息直接由I / O线程执行
+ * 哪些消息直接由I/O线程执行
  */
 public class WrappedChannelHandler implements ChannelHandlerDelegate {
 
@@ -80,8 +80,8 @@ public class WrappedChannelHandler implements ChannelHandlerDelegate {
 
     protected void sendFeedback(Channel channel, Request request, Throwable t) throws RemotingException {
         if (request.isTwoWay()) {
-            String msg = "Server side(" + url.getIp() + "," + url.getPort()
-                    + ") thread pool is exhausted, detail msg:" + t.getMessage();
+            String msg = "服务端(" + url.getIp() + "," + url.getPort()
+                    + ") 线程池满了, detail msg:" + t.getMessage();
             Response response = new Response(request.getId(), request.getVersion());
             response.setStatus(Response.SERVER_THREADPOOL_EXHAUSTED_ERROR);
             response.setErrorMessage(msg);

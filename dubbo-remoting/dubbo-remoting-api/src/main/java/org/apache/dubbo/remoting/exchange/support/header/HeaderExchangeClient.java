@@ -61,7 +61,9 @@ public class HeaderExchangeClient implements ExchangeClient {
 
         if (startTimer) {
             URL url = client.getUrl();
+            //重连任务
             startReconnectTask(url);
+            //心跳任务，默认这里不会发送心跳，因为netty本身就有心跳机制
             startHeartBeatTask(url);
         }
     }

@@ -142,7 +142,7 @@ public class NacosRegistry extends FailbackRegistry {
         });
         return urls;
     }
-
+    //注册服务
     @Override
     public void doRegister(URL url) {
         final String serviceName = getServiceName(url);

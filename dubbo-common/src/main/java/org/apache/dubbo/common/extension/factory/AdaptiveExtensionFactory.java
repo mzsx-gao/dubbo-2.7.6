@@ -31,8 +31,8 @@ import java.util.List;
 public class AdaptiveExtensionFactory implements ExtensionFactory {
 
     /**
-     * 存储其他类型的 ExtensionFactory。Dubbo 目前提供了两种 ExtensionFactory，分别是 SpiExtensionFactory 和 SpringExtensionFactory。
-     * 前者用于创建自适应的拓展，后者是用于从 Spring 的 IOC 容器中获取所需的拓展
+     * 存储其他类型的 ExtensionFactory。Dubbo 目前提供了两种 ExtensionFactory，分别是 SpiExtensionFactory
+     * 和 SpringExtensionFactory；前者用于创建自适应的拓展，后者是用于从 Spring 的 IOC 容器中获取所需的拓展
      */
     private final List<ExtensionFactory> factories;
 

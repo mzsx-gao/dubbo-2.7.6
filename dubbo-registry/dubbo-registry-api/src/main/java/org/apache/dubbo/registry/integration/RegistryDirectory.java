@@ -179,11 +179,23 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
         return shouldRegister;
     }
 
-    // 订阅 providers、configurators、routers 等节点数据
+    /**
+     * 服务目录需要订阅的几个路径
+     * 当前应用所对应的动态配置目录：/dubbo/config/dubbo/dubbo-demo-consumer-application.configurators
+     * 当前所引入的服务的动态配置目录：/dubbo/config/dubbo/org.apache.dubbo.demo.DemoService:1.1.1:g1.configurators
+     * 当前所引入的服务的提供者目录：/dubbo/org.apache.dubbo.demo.DemoService/providers
+     * 当前所引入的服务的老版本动态配置目录：/dubbo/org.apache.dubbo.demo.DemoService/configurators
+     * 当前所引入的服务的老版本路由器目录：/dubbo/org.apache.dubbo.demo.DemoService/routers
+     */
     public void subscribe(URL url) {
         setConsumerUrl(url);
+        // 监听consumer应用
         CONSUMER_CONFIGURATION_LISTENER.addNotifyListener(this);
+        // 监听所引入的服务的动态配置
         serviceConfigurationListener = new ReferenceConfigurationListener(this, url);
+
+        //这里订阅providers,configurators,routers,订阅完会直接先通知一下监听器
+        //此类中的服务提供者列表就是在监听器中处理赋值的（notify方法）
         registry.subscribe(url, this);
     }
 
@@ -227,7 +239,7 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
         }
     }
 
-    // 通知更新configurators、routers、invokers等节点信息
+    // 通知更新providers、configurators、routers、invokers等节点信息
     @Override
     public synchronized void notify(List<URL> urls) {
         Map<String, List<URL>> categoryUrls = urls.stream()
@@ -292,14 +304,14 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
     private void refreshInvoker(List<URL> invokerUrls) {
         Assert.notNull(invokerUrls, "invokerUrls should not be null");
         //如果就一个invokeUrl并且协议是empty则清除所有invoker
-        if (invokerUrls.size() == 1
-                && invokerUrls.get(0) != null
-                && EMPTY_PROTOCOL.equals(invokerUrls.get(0).getProtocol())) {
+        if (invokerUrls.size() == 1 && invokerUrls.get(0) != null
+            && EMPTY_PROTOCOL.equals(invokerUrls.get(0).getProtocol())) {
             this.forbidden = true; // Forbid to access
             this.invokers = Collections.emptyList();
             routerChain.setInvokers(this.invokers);
             destroyAllInvokers(); // Close all invokers
-        } else {
+        }
+        else {
             this.forbidden = false; // Allow to access
             Map<String, Invoker<T>> oldUrlInvokerMap = this.urlInvokerMap; // local reference
             if (invokerUrls == Collections.<URL>emptyList()) {
@@ -460,7 +472,8 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
                         enabled = url.getParameter(ENABLED_KEY, true);
                     }
                     if (enabled) {
-                        // 这里的protocol是Dubboprotocol的包装类ProtocolFilterWrapper,refer方法返回的是AsyncToSyncInvoker里包着DubboInvoker
+                        // 这里的protocol是Dubboprotocol的包装类ProtocolFilterWrapper,
+                        // refer方法返回的是AsyncToSyncInvoker里包着DubboInvoker
                         invoker = new InvokerDelegate<>(protocol.refer(serviceType, url), url, providerUrl);
                     }
                 } catch (Throwable t) {
@@ -743,6 +756,10 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
         }
     }
 
+    /**
+     * 监听所引入的服务的动态配置，当服务的动态配置发生了修改后，会调用RegistryDirectory的refreshInvoker()方法，
+     * 对应的路径为："/dubbo/config/dubbo/org.apache.dubbo.demo.DemoService:1.1.1:g1.configurators"
+     */
     private static class ReferenceConfigurationListener extends AbstractConfiguratorListener {
         private RegistryDirectory directory;
         private URL url;
@@ -764,6 +781,10 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
         }
     }
 
+    /**
+     * 监听本应用的动态配置，当应用的动态配置发生了修改后，会调用RegistryDirectory的refreshInvoker()方法，
+     * 对应的路径为："/dubbo/config/dubbo/dubbo-demo-consumer-application.configurators"
+     */
     private static class ConsumerConfigurationListener extends AbstractConfiguratorListener {
         List<RegistryDirectory> listeners = new ArrayList<>();
 

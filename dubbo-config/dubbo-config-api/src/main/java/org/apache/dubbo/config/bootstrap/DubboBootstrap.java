@@ -504,7 +504,7 @@ public class DubboBootstrap extends GenericEventListener {
         ApplicationModel.initFrameworkExts();
         /**
          * 启动配置中心:
-         * 该方法从ConfigManager中获得的所有的ConfigCenterConfig对象。然后访问配置中心的配置，将这些配置保存到Environment对象，
+         * 该方法从ConfigManager中获得所有的ConfigCenterConfig对象，然后访问配置中心的配置，将这些配置保存到Environment对象，
          * 最后使用这些配置更新ApplicationConfig，MonitorConfig，ModuleConfig等对象的属性。
          * 配置中心可以有多个，在获取配置的时候，顺次访问每个配置中心，配置保存到本地时后访问的配置中心配置会覆盖之前的配置数据
          */
@@ -760,10 +760,11 @@ public class DubboBootstrap extends GenericEventListener {
             if (logger.isInfoEnabled()) {
                 logger.info(NAME + " is starting...");
             }
-            // 1. 暴露dubbo服务
+            // 1. 暴露dubbo服务 - 注册服务以及对外暴露服务
             exportServices();
 
             // Not only provider register
+            //这个逻辑一般不会走
             if (!isOnlyRegisterProvider() || hasExportedServices()) {
                 // 2. export MetadataService
                 // 暴露MetadataService
